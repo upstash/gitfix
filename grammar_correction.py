@@ -6,8 +6,7 @@ def generate_gramatically_correct_content(client, file_content):
   if len(file_content) > 4e6:
     raise Exception("File content is too large")
   completion = client.chat.completions.create(
-    model="gpt-4-turbo-preview", 
-    temperature=0,
+    model="gpt-4-turbo-preview",top_p=1,
     messages=[
       {"role": "system", "content": """
       I want you to fix grammatical errors in an mdx file.
@@ -26,4 +25,5 @@ def generate_gramatically_correct_content(client, file_content):
       {"role": "user", "content": file_content}
     ]
   )
+  return completion.choices[0].message.content
 

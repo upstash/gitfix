@@ -9,7 +9,7 @@ import random
 
 from github_api import Github_API_Wrapper
 from redis import Redis_Wrapper as Redis
-from grammar_correction import correction_mock
+from grammar_correction import generate_gramatically_correct_content
 def read_config_file():
     config = None
     if not os.path.isfile("config.yaml"):
@@ -41,11 +41,11 @@ if __name__ == "__main__":
     redis = Redis(config["upstash-redis-url"], config["upstash-redis-token"])
     unupdated_items = redis.get_difference(path,original_repo.items)
 
-    openai_client = None
+    openai_client = OpenAI(api_key=config["openai-key"])
     for n in range(config["files-per-run"]):
         k = random.randint(0, len(original_repo.items)-1)
         file_content = original_repo.get_item_content(k)
-        corrected_content = correction_mock(openai_client, file_content)
+        corrected_content = generate_gramatically_correct_content(openai_client, file_content)
         forked_repo.update_file_content(k, corrected_content)
         redis.insert(path, forked_repo.items[k])
     forked_repo.create_PR(forked_repo)
