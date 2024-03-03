@@ -2,7 +2,7 @@ from upstash_redis import Redis
 
 import random
 import string
-
+import json
 def generate_random_string(length):
     return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 
@@ -24,5 +24,5 @@ class Redis_Wrapper:
         difference = self.redis.sdiff(random_set, set_name)
         
         self.redis.delete(random_set)
-        return difference
+        return json.loads(difference[0])
 

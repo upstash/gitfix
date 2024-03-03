@@ -8,21 +8,28 @@ class Github_API_Wrapper():
         self.auth = auth
         self.items = []
         self.populate_details()
-    def get_items(self):
+    def get_items(self, printer = None, demo_mode = False):
         initial_page_size = 100
+        if demo_mode:
+            initial_page_size = 30
         page_size = initial_page_size
         page= 1
-        while page_size ==100:
+        output = "Discovered items: \n"
+        while page_size ==initial_page_size:
             url = f"https://api.github.com/search/code?q=extension:mdx+extension:md+repo:{self.owner}/{self.repo}&per_page={initial_page_size}&page={page}"
             headers = {"Accept": "application/vnd.github+json",
                     "Authorization": f"Bearer {self.auth}"}
             response = requests.get(url, headers=headers)
             page_size = len(response.json()["items"])
             for item in (response.json()["items"]):
+                output += f"\t{item['path']}\n"
                 print(f"{item['path']}")
                 self.items.append((item['path'], item['sha']))
             page += 1
-        response.close()
+            response.close()
+            if demo_mode:
+                break
+        printer.print(output)
     def get_item_content(self, index):
         url = f"https://api.github.com/repos/{self.owner}/{self.repo}/contents/{self.items[index][0]}"
         headers = {"Accept": "application/vnd.github.raw+json",
