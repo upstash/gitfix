@@ -27,6 +27,13 @@ def read_config_file():
 def gitfix(owner, repo, printer, demo_mode = False):
     printer.print(f"Processing the repository {owner}/{repo}")
     config = read_config_file()
+    redis = Redis_Wrapper(config["upstash-redis-url"], config["upstash-redis-token"], from_fly=config['redis-from-fly'])
+    path = f"{owner}/{repo}"
+    if demo_mode:
+        changed_files = redis.get_members(path)
+        if len(changed_files) >= 3:
+            printer.print("GitFix already fixed 3 files in this repository in demo mode.\n Use GitFix in your local to correct more files.")
+            return
     original_repo = Github_API_Wrapper(owner, repo, config["github-token"])
     original_repo.get_items(printer=printer, demo_mode=demo_mode)
     if not (len(original_repo.items) > 0):
@@ -45,8 +52,6 @@ def gitfix(owner, repo, printer, demo_mode = False):
   
     printer.print("Establishing redis connection.")
     try:
-        redis = Redis_Wrapper(config["upstash-redis-url"], config["upstash-redis-token"], from_fly=config['redis-from-fly'])
-        path = f"{owner}/{repo}"
         unupdated_items = redis.get_difference(path,original_repo.items)
         print(unupdated_items)
         original_repo.items = unupdated_items
@@ -76,10 +81,9 @@ def gitfix(owner, repo, printer, demo_mode = False):
     for k in indexes:
         printer.print(f"Updating {original_repo.items[k][0]}")
         file_content = original_repo.get_item_content(k)
-        if len(file_content) < 50:
-            continue
-        corrected_content = generate_gramatically_correct_content(openai_client, file_content)
-        forked_repo.update_file_content(k, corrected_content)
+        if len(file_content) > 50:
+            corrected_content = generate_gramatically_correct_content(openai_client, file_content)
+            forked_repo.update_file_content(k, corrected_content)
         redis.insert(path, forked_repo.items[k])
     printer.print("Creating PR request")
     original_repo.create_PR(forked_repo)
@@ -94,6 +98,6 @@ if __name__ == "__main__":
         def print(self ,str):
             print(str)
     printer = Local_Printer()
-    gitfix(owner, repo, printer=printer)
+    gitfix(owner, repo, printer=printer,demo_mode=False)
      
     
