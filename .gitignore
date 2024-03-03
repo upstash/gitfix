@@ -3,9 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+gitfix
 # C extensions
 *.so
-
+#
 #config file
 config.yaml
 # Distribution / packaging
