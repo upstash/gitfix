@@ -26,14 +26,27 @@ class Redis_Wrapper:
     def insert(self, set_name, items):
 
         self.redis.sadd(set_name, items)
+    
+    def bulk_insert(self, set_name, items):
+        for i in items:
+            self.insert(set_name,i)
 
     def get_difference(self, set_name, items):
 
         random_set = generate_random_string(20)
-        self.insert(random_set, items)
+        self.bulk_insert(random_set, items)
 
         difference = self.redis.sdiff(random_set, set_name)
         
         self.redis.delete(random_set)
-        return json.loads(difference[0])
+        result = []
+        for i in difference:
+            result.append(json.loads(i))
+        return result
+    def get_members(self, set_name):
+        members = self.redis.smembers(set_name)
+        result = []
+        for i in members:
+            result.append(json.loads(i))
+        return result
 
