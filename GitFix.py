@@ -53,6 +53,9 @@ def gitfix(owner, repo, printer, demo_mode = False):
     printer.print("Establishing redis connection.")
     try:
         unupdated_items = redis.get_difference(path,original_repo.items)
+        if len(unupdated_items) < 1:
+            printer.print("All grammar errors in the repository are previously corrected by GitFix")
+            return
         print(unupdated_items)
         original_repo.items = unupdated_items
         forked_repo.items = unupdated_items
