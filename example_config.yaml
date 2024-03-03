@@ -4,3 +4,4 @@ github-token: "classical github token"
 upstash-redis-url: "https://gitfix-redis-url-upstash.io"
 upstash-redis-token: ""
 openai-key: ""
+redis-from-fly: False #set to true if you are using FLY as a redis provider

@@ -1,6 +1,7 @@
 import requests
 import json
 import base64 
+import time
 class Github_API_Wrapper():
     def __init__(self, owner, repo, auth):
         self.owner = owner
@@ -92,15 +93,21 @@ class Github_API_Wrapper():
     def create_a_ref_from_default_branch(self, new_ref_name):
         original_ref = self.get_default_branch()
         return self.create_a_reference(original_ref, new_ref_name)
-    def get_ref(self, ref):
+    def get_ref(self, ref, trials = 0):
         url = f"https://api.github.com/repos/{self.owner}/{self.repo}/git/ref/heads/{ref}"
         headers = {"Accept": "application/vnd.github.raw+json",
                 "Authorization": f"Bearer {self.auth}",
                 "X-GitHub-Api-Version":"2022-11-28"
                 }
         content = requests.get(url, headers=headers)
-        body = json.loads(content.text)
-        return body
+        if content.status_code != 200:
+            if trials > 15:
+                raise Exception("could not create reference")
+            time.sleep(2)
+            return self.get_ref(ref, trials=trials+1)
+        else:
+            body = json.loads(content.text)
+            return body
     def populate_details(self):
         url = f"https://api.github.com/repos/{self.owner}/{self.repo}"
         headers = {"Accept": "application/vnd.github.raw+json",

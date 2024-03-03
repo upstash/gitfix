@@ -1,4 +1,4 @@
-from upstash_redis import Redis
+
 
 import random
 import string
@@ -8,9 +8,20 @@ def generate_random_string(length):
 
 
 class Redis_Wrapper:
-    def __init__(self, url, token):
+    def __init__(self, url, token, from_fly=False):
 
-        self.redis = Redis(url=url, token=token)
+        if not from_fly:
+            print("connecting to redis via upstash-redis")
+            from upstash_redis import Redis
+            self.redis = Redis(url=url, token=token)
+        else:
+            import redis
+            print("Connecting to fly hosted redis")
+            self.redis= redis.Redis(
+                host=url,
+                port=6379,
+                password=token
+                )
 
     def insert(self, set_name, items):
 

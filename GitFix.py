@@ -6,10 +6,10 @@ from colorama import Fore
 from openai import OpenAI
 import random
 import time
-
+import random
 
 from github_api import Github_API_Wrapper
-from redis import Redis_Wrapper as Redis
+from redis_manager import Redis_Wrapper
 from grammar_correction import generate_gramatically_correct_content
 def read_config_file():
     config = None
@@ -33,7 +33,8 @@ def gitfix(owner, repo, printer, demo_mode = False):
         printer.print("""Gitfix could not discover any files in the repositoy.\n
                       Make sure you inputed your repository name correctly and your repository is indexed in Github search engine.\n
                       If your repository is not indexed, please wait a while until Github indexes your repository.
-                      """)    
+                      """)   
+        return 
     printer.print("Forking the repository.")
     try:
         forked_repo = original_repo.fork()
@@ -42,25 +43,41 @@ def gitfix(owner, repo, printer, demo_mode = False):
         printer.print("Forking process failed, aborting!")
         return
   
-    forked_repo.create_a_ref_from_default_branch("gitfix")
     printer.print("Establishing redis connection.")
     try:
-        redis = Redis(config["upstash-redis-url"], config["upstash-redis-token"])
+        redis = Redis_Wrapper(config["upstash-redis-url"], config["upstash-redis-token"], from_fly=config['redis-from-fly'])
+        path = f"{owner}/{repo}"
         unupdated_items = redis.get_difference(path,original_repo.items)
+        print(unupdated_items)
         original_repo.items = unupdated_items
         forked_repo.items = unupdated_items
-    except:
+    except Exception as e:
         printer.print("Cannot connect to redis, aborting!")
+        print(e)
         return
     openai_client = OpenAI(api_key=config["openai-key"])
-    indexes = [random.randint(0, len(original_repo.items)-1) for i in range(config['files-per-run'])]
+    indexes = [0] + random.sample(range(1,len(original_repo.items)), min(len(original_repo.items),config['files-per-run'])-1)
     printer.print("Selecting files to update.")
     printer.print("Selected files:")
     for k in indexes:
         printer.print(f"\t {original_repo.items[k][0]}")
+    try:
+        forked_repo.create_a_ref_from_default_branch("gitfix")
+    except:
+        if demo_mode:
+            printer.print("""Gitfix could not create a new branch for changes.\n
+                      Please try again in a minute.
+                      """)   
+        else:
+            printer.print("""Gitfix could not create a new branch for changes.\n
+                      Make sure your github token has write rights.
+                      """)   
+        return 
     for k in indexes:
         printer.print(f"Updating {original_repo.items[k][0]}")
         file_content = original_repo.get_item_content(k)
+        if len(file_content) < 50:
+            continue
         corrected_content = generate_gramatically_correct_content(openai_client, file_content)
         forked_repo.update_file_content(k, corrected_content)
         redis.insert(path, forked_repo.items[k])
