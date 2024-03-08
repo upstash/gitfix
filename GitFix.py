@@ -27,7 +27,7 @@ def read_config_file():
 def gitfix(owner, repo, printer, demo_mode = False):
     printer.print(f"Processing the repository {owner}/{repo}")
     config = read_config_file()
-    redis = Redis_Wrapper(config["upstash-redis-url"], config["upstash-redis-token"], from_fly=config['redis-from-fly'])
+    redis = Redis_Wrapper(config["upstash-redis-url"], config["upstash-redis-token"], from_fly=config['redis-password'])
     path = f"{owner}/{repo}"
     if demo_mode:
         changed_files = redis.get_members(path)
