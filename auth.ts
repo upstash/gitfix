@@ -26,7 +26,6 @@ export const config = {
     },
     session: ({ session, token }) => {
       if (session?.user) {
-        // session.user.username = token.username
         session.user.username = token.username as string
       }
       return session
