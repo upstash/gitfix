@@ -5,7 +5,7 @@ import GitHub from 'next-auth/providers/github'
 declare module 'next-auth' {
   interface Session {
     user: {
-      username: string
+      username?: string | null
     } & DefaultSession['user']
   }
 }
@@ -14,12 +14,10 @@ export const config = {
   providers: [GitHub],
   basePath: '/auth',
   callbacks: {
-    authorized({ request, auth }) {
+    authorized() {
       return true
     },
-    jwt({ token, profile,account }) {
-      console.log(account)
-      // console.log(profile) // github user profile
+    jwt({ token, profile }) {
       if (profile) {
         token.username = profile.login
         token.name = profile.name
@@ -27,9 +25,9 @@ export const config = {
       return token
     },
     session: ({ session, token }) => {
-      if (session?.user && token?.username) {
-        // @ts-ignore
-        session.user.username = token?.username
+      if (session?.user) {
+        // session.user.username = token.username
+        session.user.username = token.username as string
       }
       return session
     }
