@@ -1,9 +1,0 @@
-requests
-fastapi
-uvicorn
-starlette
-pyyaml
-openai
-upstash-redis
-colorama
-redis
