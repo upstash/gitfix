@@ -118,7 +118,7 @@ export default function Flow({ data }: { data: Repository[] }) {
                   onChange={e => setQuery(e.target.value)}
                 />
                 <Content className="p-0 mt-4">
-                  <ScrollArea className={cn('h-[280px] p-2 w-full')}>
+                  <ScrollArea className={cn('h-[260px] p-2 w-full')}>
                     <Table className="text-left">
                       <TableBody>
                         {filterData.map(repo => (
