@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { Repository } from '../lib/types'
+import { Repository } from 'lib/types'
 import { Step, StepContent, StepItem, StepNumber, StepTitle } from './step-list'
 import Image from 'next/image'
 import { Button } from './ui/button'
@@ -11,14 +11,16 @@ import Fuse from 'fuse.js'
 import { Input } from './ui/input'
 import { ScrollArea } from './ui/scroll-area'
 import { Table, TableBody, TableCell, TableRow } from './ui/table'
-import { cn } from '../lib/utils'
+import { cn } from 'lib/utils'
 import IconGitHub from './icon-github'
 import Content from './content'
 
 export default function Flow({ data }: { data: Repository[] }) {
   const { data: session } = useSession()
+
+  const [query, setQuery] = React.useState<string>('')
   const [repo, setRepo] = React.useState<Repository>()
-  const [query, setQuery] = React.useState('')
+  const [streamText, setStreamText] = React.useState<{ text: string }[]>([])
 
   const fuse = new Fuse(data, {
     keys: ['name']
@@ -45,8 +47,9 @@ export default function Flow({ data }: { data: Repository[] }) {
 
       const decoder = new TextDecoder()
       const newData = decoder.decode(value)
-      const parseData: { text: string } = JSON.parse(newData)
-      console.log(parseData.text)
+      const parseData = JSON.parse(newData)
+      console.log(parseData)
+      setStreamText(prevState => [...prevState, parseData])
     }
   }
 
@@ -102,6 +105,7 @@ export default function Flow({ data }: { data: Repository[] }) {
                   variant="outline"
                   onClick={() => {
                     setRepo(undefined)
+                    setStreamText([])
                   }}
                 >
                   Change
@@ -128,7 +132,10 @@ export default function Flow({ data }: { data: Repository[] }) {
                                 className=""
                                 onClick={async () => {
                                   setRepo(repo)
-                                  // await fixRepo(session.user.username!, repo.name)
+                                  await fixRepo(
+                                    session.user.username!,
+                                    repo.name
+                                  )
                                 }}
                               >
                                 Select
@@ -150,9 +157,17 @@ export default function Flow({ data }: { data: Repository[] }) {
       <StepItem>
         <StepNumber />
         <StepTitle>Creating PR Request</StepTitle>
-        {session && (
+        {repo && (
           <StepContent>
-            Fixing grammatical errors in your md/mdx files
+            <Content>
+              <pre className="text-sm whitespace-pre-wrap">
+                {streamText.map((o, i) => (
+                  <span key={i} className="block last:font-semibold">
+                    {o.text}
+                  </span>
+                ))}
+              </pre>
+            </Content>
           </StepContent>
         )}
       </StepItem>
