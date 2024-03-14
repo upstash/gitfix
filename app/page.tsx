@@ -7,8 +7,9 @@ import { SessionProvider } from 'next-auth/react'
 
 export default async function Home() {
   const session = await auth()
+
   const repos: Repository[] = await getRepositories(
-    session?.user.username || ''
+    session?.user.username as string
   )
 
   return (
@@ -19,7 +20,7 @@ export default async function Home() {
           <h3 className="mt-2 text-xl font-medium">
             Correct grammar errors in your md and mdx files!
           </h3>
-          <p className="mt-1 text-xl opacity-80 text-pretty md:mx-24">
+          <p className="mt-1 text-lg opacity-60 text-pretty md:mx-24">
             Gitfix uses github and OpenAI apis to fetch your md/mdx files and
             uses GPT4 to correct grammatical errors.
           </p>

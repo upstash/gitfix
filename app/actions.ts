@@ -15,7 +15,6 @@ export async function getRepositories(username: string): Promise<Repository[]> {
       }
     })
     const data = await res.json()
-    // console.log(data)
     return data
   } catch (error) {
     return []
