@@ -34,24 +34,19 @@ export default function List({ data }: { data: Repository[] }) {
 
   return (
     <div>
-      <Input
-        placeholder="Search repository..."
-        onChange={e => setQuery(e.target.value)}
-      />
+      <Input placeholder="Search..." onChange={e => setQuery(e.target.value)} />
 
       <ScrollArea
-        type="always"
-        className="
-        mt-4
-        p-2 rounded-xl border border-zinc-100 dark:border-zinc-800"
+        className="h-[280px] mt-4 bg-zinc-50 shadow-sm
+        p-1 rounded-md border border-zinc-200 dark:border-zinc-800"
       >
         <Table className="text-left">
           <TableBody>
             {filterData.map(repo => (
-              <TableRow key={repo.id} className="dark:border-b-zinc-800">
-                <TableCell className="font-medium">{repo.name}</TableCell>
-                <TableCell className="text-right">
-                  <Button variant="secondary" size="sm" className="h-6">
+              <TableRow key={repo.id}>
+                <TableCell className="font-medium py-2">{repo.name}</TableCell>
+                <TableCell className="text-right py-2">
+                  <Button size="sm" className="">
                     Select
                   </Button>
                 </TableCell>

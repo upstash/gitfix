@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+  .step-item:before {
+    counter-increment: step;
+    content: counter(step);
+  }
+}

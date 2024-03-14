@@ -1,8 +1,9 @@
 import { auth } from 'auth'
-import Header from 'components/header'
 import { getRepositories } from './actions'
 import { Repository } from 'lib/types'
-import List from '../components/list'
+import React from 'react'
+import Flow from 'components/flow'
+import { SessionProvider } from 'next-auth/react'
 
 export default async function Home() {
   const session = await auth()
@@ -11,32 +12,28 @@ export default async function Home() {
   )
 
   return (
-    <main className="text-center max-w-screen-md mx-auto px-6">
-      <header>
-        <h1>GitFix</h1>
+    <SessionProvider basePath={'/auth'} session={session}>
+      <main className="max-w-screen-md mx-auto px-6 pt-10 pb-40">
+        <header>
+          <h1>GitFix</h1>
 
-        <h3>Correct grammar errors in your md and mdx files!</h3>
+          <h3>Correct grammar errors in your md and mdx files!</h3>
 
-        <p>
-          Gitfix uses github and OpenAI apis to fetch your md/mdx files and uses
-          GPT4 to correct grammatical errors.
-        </p>
+          <p>
+            Gitfix uses github and OpenAI apis to fetch your md/mdx files and
+            uses GPT4 to correct grammatical errors.
+          </p>
 
-        <p>
-          Begin by inserting your public Github repo&apos;s link to the text
-          area.
-        </p>
+          <p>
+            Begin by inserting your public Github repo&apos;s link to the text
+            area.
+          </p>
+        </header>
 
         <div className="mt-10">
-          <Header />
+          <Flow data={repos} />
         </div>
-
-        {session && (
-          <div className="mt-10">
-            <List data={repos} />
-          </div>
-        )}
-      </header>
-    </main>
+      </main>
+    </SessionProvider>
   )
 }
