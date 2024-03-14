@@ -7,7 +7,10 @@ export default function Content({ className, ...props }: ContentProps) {
   return (
     <div
       className={cn(
-        'flex items-center p-4 bg-zinc-50 rounded-md border border-zinc-200 shadow-sm',
+        'flex items-center p-4',
+        'bg-zinc-50 dark:bg-zinc-900',
+        'border border-zinc-200 dark:border-zinc-800',
+        'rounded-md shadow-sm',
         className
       )}
       {...props}

@@ -24,7 +24,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <body
         className={cn(
-          'antialiased bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-200'
+          'antialiased bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-200'
         )}
       >
         {children}

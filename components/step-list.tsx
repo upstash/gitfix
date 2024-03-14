@@ -13,7 +13,10 @@ export interface StepItemProps extends React.ComponentPropsWithoutRef<'div'> {}
 const StepItem = ({ className, ...props }: StepItemProps) => {
   return (
     <div
-      className={cn('relative ml-4 pb-16 border-l pl-8 last:pb-0', className)}
+      className={cn(
+        'relative ml-4 pb-16 border-l border-l-zinc-200 dark:border-l-zinc-900 pl-8 last:pb-0',
+        className
+      )}
       {...props}
     />
   )
@@ -32,8 +35,8 @@ const StepNumber = ({ className, ...props }: StepNumberProps) => {
           'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2',
           'size-10 flex items-center justify-center',
           'text-center font-mono',
-          'bg-zinc-100 rounded-full',
-          'border-4 border-white',
+          'bg-zinc-100 dark:bg-zinc-900 rounded-full',
+          'border-4 border-white dark:border-zinc-950',
           className
         )}
         {...props}

@@ -14,6 +14,7 @@ import { Table, TableBody, TableCell, TableRow } from './ui/table'
 import { cn } from 'lib/utils'
 import IconGitHub from './icon-github'
 import Content from './content'
+import { LoaderCircle } from 'lucide-react'
 
 export default function Flow({ data }: { data: Repository[] }) {
   const { data: session } = useSession()
@@ -21,6 +22,7 @@ export default function Flow({ data }: { data: Repository[] }) {
   const [query, setQuery] = React.useState<string>('')
   const [repo, setRepo] = React.useState<Repository>()
   const [streamText, setStreamText] = React.useState<{ text: string }[]>([])
+  const [isStream, setIsStream] = React.useState<boolean>(false)
 
   const fuse = new Fuse(data, {
     keys: ['name']
@@ -41,10 +43,13 @@ export default function Flow({ data }: { data: Repository[] }) {
 
     const reader = response.body.getReader()
 
+    setIsStream(true)
     while (true) {
       const { done, value } = await reader.read()
-      if (done) return
-
+      if (done) {
+        setIsStream(false)
+        break
+      }
       const decoder = new TextDecoder()
       const newData = decoder.decode(value)
       const parseData = JSON.parse(newData)
@@ -160,12 +165,20 @@ export default function Flow({ data }: { data: Repository[] }) {
         {repo && (
           <StepContent>
             <Content>
-              <pre className="text-sm whitespace-pre-wrap">
+              <pre className="w-full text-sm leading-relaxed text-pretty">
                 {streamText.map((o, i) => (
-                  <span key={i} className="block last:font-semibold">
+                  <span
+                    key={i}
+                    className="block w-full last:font-semibold last:text-emerald-600"
+                  >
                     {o.text}
                   </span>
                 ))}
+                {isStream && (
+                  <span className="block">
+                    <LoaderCircle size={20} className="animate-spin" />
+                  </span>
+                )}
               </pre>
             </Content>
           </StepContent>
