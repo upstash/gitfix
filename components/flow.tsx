@@ -52,7 +52,7 @@ export default function Flow({ data }: { data: Repository[] }) {
       }
       const decoder = new TextDecoder()
       const newData = decoder.decode(value)
-      const parseData = JSON.parse(newData)
+      const parseData = JSON.parse(newData.replace(/\n/g, ''))
       console.log(parseData)
       setStreamText(prevState => [...prevState, parseData])
     }
@@ -164,19 +164,20 @@ export default function Flow({ data }: { data: Repository[] }) {
         <StepTitle>Creating PR Request</StepTitle>
         {repo && (
           <StepContent>
-            <Content>
-              <pre className="w-full text-sm leading-relaxed text-pretty">
+            <Content className="px-5✓">
+              <pre className="w-full text-sm text-pretty whitespace-pre-wrap">
                 {streamText.map((o, i) => (
                   <span
                     key={i}
-                    className="block w-full last:font-semibold last:text-emerald-600"
+                    className="flex w-full mt-1 last:text-emerald-500"
                   >
-                    {o.text}
+                    {o.text.replace(/\n /g, '\n').replace(/\t/g, ' ✓ ')}
                   </span>
                 ))}
                 {isStream && (
-                  <span className="block">
+                  <span className="mt-1 flex items-center gap-2 text-emerald-500">
                     <LoaderCircle size={20} className="animate-spin" />
+                    Processing...
                   </span>
                 )}
               </pre>
