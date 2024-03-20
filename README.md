@@ -1,6 +1,6 @@
 # GitFix
 
-GitFix is a grammar correction application that uses GPT4 to correct grammar errors in md and mdx files in github repositories with a single click.
+GitFix is a grammar correction application that uses GPT4 to correct grammar errors in md and mdx files Github repositories and send a pull request with a single click.
 
 > [!NOTE]  
 > **This project is a Community Project.**
