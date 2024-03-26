@@ -3,6 +3,7 @@ export const maxDuration = 300;
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic'; // always run dynamically
 
+// import config from '../../../../../../config.json'
 import gitfix from "./gitfix";
 type Params = {
   owner: string,
@@ -36,7 +37,7 @@ export async function GET(request: Request, context: { params: Params }) {
     },
   });
   return new Response(customReadable, {
-    headers: { 'Content-Type': 'text/html; charset=utf-8', 
+    headers: { 'Content-Type': 'text/html', 
               'Cache-Control': 'no-cache',
               'Access-Control-Allow-Credentials': 'true',
               'Access-Control-Allow-Origin': '*',
