@@ -1,28 +1,36 @@
 'use client'
 
-import React from 'react'
-import { Repository } from 'lib/types'
+import * as React from 'react'
+import { useFormState, useFormStatus } from 'react-dom'
+import { Profile, Repository } from 'lib/types'
 import { Step, StepContent, StepItem, StepNumber, StepTitle } from './step-list'
-import Image from 'next/image'
 import { Button } from './ui/button'
-import Link from 'next/link'
-import { useSession } from 'next-auth/react'
-import Fuse from 'fuse.js'
 import { Input } from './ui/input'
 import { ScrollArea } from './ui/scroll-area'
 import { Table, TableBody, TableCell, TableRow } from './ui/table'
-import { cn } from 'lib/utils'
+import { cn, ResultCode } from 'lib/utils'
 import IconGitHub from './icon-github'
+import Image from 'next/image'
 import Content from './content'
 import { LoaderCircle } from 'lucide-react'
+import { getRepositories } from 'app/actions'
+import Fireworks from 'react-canvas-confetti/dist/presets/fireworks'
+import Fuse from 'fuse.js'
 
-export default function Flow({ data }: { data: Repository[] }) {
-  const { data: session } = useSession()
+export default function Flow() {
+  const [result, dispatch] = useFormState(getRepositories, undefined)
+  const { pending } = useFormStatus()
 
   const [query, setQuery] = React.useState<string>('')
   const [repo, setRepo] = React.useState<Repository>()
+
   const [streamText, setStreamText] = React.useState<{ text: string }[]>([])
-  const [isStream, setIsStream] = React.useState<boolean>(false)
+  const [isStream, setStream] = React.useState<boolean>(false)
+  const [isFinish, setFinish] = React.useState<boolean>(false)
+
+  const hasRepo = result && result?.type === ResultCode.Success
+  const user = hasRepo && (result.repos[0].owner as Profile)
+  const data = hasRepo ? result.repos : []
 
   const fuse = new Fuse(data, {
     keys: ['name']
@@ -35,6 +43,7 @@ export default function Flow({ data }: { data: Repository[] }) {
       return alert('Please enter a valid username and repo')
     }
 
+    setFinish(false)
     const response = await fetch(`https://gitfix.fly.dev/${username}/${repo}`)
 
     if (!response.body) {
@@ -42,12 +51,12 @@ export default function Flow({ data }: { data: Repository[] }) {
     }
 
     const reader = response.body.getReader()
+    setStream(true)
 
-    setIsStream(true)
     while (true) {
       const { done, value } = await reader.read()
       if (done) {
-        setIsStream(false)
+        setStream(false)
         break
       }
       const decoder = new TextDecoder()
@@ -56,135 +65,160 @@ export default function Flow({ data }: { data: Repository[] }) {
       console.log(parseData)
       setStreamText(prevState => [...prevState, parseData])
     }
+
+    setFinish(true)
   }
 
   return (
-    <Step>
-      {/* Login with GitHub */}
-      <StepItem>
-        <StepNumber />
-        <StepTitle>Login with GitHub</StepTitle>
-        <StepContent>
-          <Content>
-            {session ? (
-              <>
-                <div className="flex items-center gap-2 w-full">
+    <>
+      <div className="fixed inset-0 z-10 pointer-events-none">
+        {isFinish && <Fireworks autorun={{ speed: 2, duration: 1200 }} />}
+      </div>
+
+      <Step>
+        {/* Github profile */}
+        <StepItem>
+          <StepNumber />
+          <StepTitle>Login with GitHub</StepTitle>
+          <StepContent>
+            <Content>
+              {user ? (
+                <>
                   <Image
-                    src={session.user.image!}
-                    alt={session.user.name!}
+                    src={user.avatar_url}
+                    alt={user.login}
                     width={32}
                     height={32}
+                    className="rounded-full"
                   />
-                  <span className="font-medium">{session.user.name}</span>
-                </div>
-                <Button size="sm" variant="outline" asChild>
-                  <Link href="/auth/signout">Logout</Link>
-                </Button>
-              </>
-            ) : (
-              <Button asChild>
-                <Link href="/auth/signin">
-                  <IconGitHub className="mr-2" height={20} />
-                  <span>Login</span>
-                </Link>
-              </Button>
-            )}
-          </Content>
-        </StepContent>
-      </StepItem>
+                  <span className="font-medium">{user.login}</span>
 
-      {/* Select a repository */}
-      <StepItem>
-        <StepNumber />
-        <StepTitle>Select a repository</StepTitle>
-        {session && (
-          <StepContent>
-            {repo ? (
-              <Content>
-                <div className="flex items-center gap-2 w-full">
-                  <IconGitHub height={28} />
-                  <span className="font-medium">{repo.html_url}</span>
-                </div>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    setRepo(undefined)
-                    setStreamText([])
-                  }}
-                >
-                  Change
-                </Button>
-              </Content>
-            ) : (
-              <>
-                <Input
-                  placeholder="Search..."
-                  onChange={e => setQuery(e.target.value)}
-                />
-                <Content className="p-0 mt-4">
-                  <ScrollArea className={cn('h-[260px] p-2 w-full')}>
-                    <Table className="text-left">
-                      <TableBody>
-                        {filterData.map(repo => (
-                          <TableRow key={repo.id}>
-                            <TableCell className="font-medium py-2">
-                              {repo.name}
-                            </TableCell>
-                            <TableCell className="text-right py-2">
-                              <Button
-                                size="sm"
-                                className=""
-                                onClick={async () => {
-                                  setRepo(repo)
-                                  await fixRepo(
-                                    session.user.username!,
-                                    repo.name
-                                  )
-                                }}
-                              >
-                                Select
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </ScrollArea>
-                </Content>
-              </>
-            )}
-          </StepContent>
-        )}
-      </StepItem>
-
-      {/* Creating PR Request */}
-      <StepItem>
-        <StepNumber />
-        <StepTitle>Creating PR Request</StepTitle>
-        {repo && (
-          <StepContent>
-            <Content className="px-5✓">
-              <pre className="w-full text-sm text-pretty whitespace-pre-wrap">
-                {streamText.map((o, i) => (
-                  <span
-                    key={i}
-                    className="flex w-full mt-1 last:text-emerald-500"
+                  <form action={dispatch} className="ml-auto flex">
+                    <input hidden name="username" />
+                    <Button size="sm" variant="outline" disabled={pending}>
+                      Change username
+                    </Button>
+                  </form>
+                </>
+              ) : (
+                <>
+                  <IconGitHub height={32} />
+                  <form
+                    action={dispatch}
+                    className="flex items-center grow gap-2"
                   >
-                    {o.text.replace(/\n /g, '\n').replace(/\t/g, ' ✓ ')}
-                  </span>
-                ))}
-                {isStream && (
-                  <span className="mt-1 flex items-center gap-2 text-emerald-500">
-                    <LoaderCircle size={20} className="animate-spin" />
-                    Processing...
-                  </span>
-                )}
-              </pre>
+                    <Input
+                      name="username"
+                      className="grow"
+                      placeholder="username"
+                      disabled={pending}
+                    />
+                    <Button size="sm" disabled={pending}>
+                      {pending && (
+                        <LoaderCircle size={20} className="animate-spin" />
+                      )}
+                      Get repositories
+                    </Button>
+                  </form>
+                </>
+              )}
             </Content>
           </StepContent>
-        )}
-      </StepItem>
-    </Step>
+        </StepItem>
+
+        {/* Select a repository */}
+        <StepItem>
+          <StepNumber />
+          <StepTitle>Select a repository</StepTitle>
+          {hasRepo && (
+            <StepContent>
+              {repo ? (
+                <Content>
+                  <div className="flex items-center gap-2 w-full">
+                    <IconGitHub height={28} />
+                    <span className="font-medium">
+                      {repo.html_url.replace('https://', '')}
+                    </span>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setRepo(undefined)
+                      setStreamText([])
+                    }}
+                  >
+                    Change repository
+                  </Button>
+                </Content>
+              ) : (
+                <>
+                  <Input
+                    placeholder="Search..."
+                    onChange={e => setQuery(e.target.value)}
+                  />
+                  <Content className="p-0 mt-4">
+                    <ScrollArea className={cn('h-[260px] p-2 w-full')}>
+                      <Table className="text-left">
+                        <TableBody>
+                          {filterData.map(repo => (
+                            <TableRow key={repo.id}>
+                              <TableCell className="font-medium py-2">
+                                {repo.name}
+                              </TableCell>
+                              <TableCell className="text-right py-2">
+                                <Button
+                                  size="sm"
+                                  className=""
+                                  onClick={async () => {
+                                    if (!user) return
+                                    setRepo(repo)
+                                    await fixRepo(user.login, repo.name)
+                                  }}
+                                >
+                                  Fix it
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </ScrollArea>
+                  </Content>
+                </>
+              )}
+            </StepContent>
+          )}
+        </StepItem>
+
+        {/* Creating PR Request */}
+        <StepItem>
+          <StepNumber />
+          <StepTitle>Creating PR Request</StepTitle>
+          {repo && (
+            <StepContent>
+              <Content className="px-5✓">
+                <pre className="w-full text-sm text-pretty whitespace-pre-wrap">
+                  {streamText.map((o, i) => (
+                    <span
+                      key={i}
+                      className="flex w-full mt-1 last:text-emerald-500"
+                    >
+                      {o.text.replace(/\n /g, '\n').replace(/\t/g, ' ✓ ')}
+                    </span>
+                  ))}
+                  {isStream && (
+                    <span className="mt-1 flex items-center gap-2 text-emerald-500">
+                      <LoaderCircle size={20} className="animate-spin" />
+                      Processing...
+                    </span>
+                  )}
+                </pre>
+              </Content>
+            </StepContent>
+          )}
+        </StepItem>
+      </Step>
+    </>
   )
 }

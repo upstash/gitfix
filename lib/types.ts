@@ -37,4 +37,5 @@ export type Repository = {
   visibility: string // 'public'
   forks: number // 0
   default_branch: string // 'master'
+  owner: Profile
 }
