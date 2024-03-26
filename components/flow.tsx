@@ -75,7 +75,7 @@ export default function Flow() {
         {isFinish && <Fireworks autorun={{ speed: 2, duration: 1200 }} />}
       </div>
 
-      <Step>
+      <Step className="mt-16">
         {/* Github profile */}
         <StepItem>
           <StepNumber />
