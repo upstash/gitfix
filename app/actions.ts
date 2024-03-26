@@ -2,7 +2,7 @@
 
 import { Repository } from 'lib/types'
 import { z } from 'zod'
-import { ResultCode } from '../lib/utils'
+import { ResultCode } from 'lib/utils'
 
 interface Result {
   type: ResultCode

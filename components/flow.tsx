@@ -40,8 +40,6 @@ export default function Flow() {
     keys: ['name']
   })
 
-  console.log(streamText)
-
   const filterData = query ? fuse.search(query).map(o => o.item) : data
 
   useEffect(() => {
@@ -76,7 +74,9 @@ export default function Flow() {
       setStream(true)
       setFinish(false)
 
-      const response = await fetch(`https://gitfix.fly.dev/${username}/${repo}`)
+      const response = await fetch(
+        `https://gitfix-next-backend.vercel.app/api/gitfix/${username}/${repo}`
+      )
 
       if (!response.body) {
         return alert('No response from server')
@@ -107,7 +107,7 @@ export default function Flow() {
   return (
     <>
       <div className="fixed inset-0 z-10 pointer-events-none">
-        {isFinish && <Fireworks autorun={{ speed: 2, duration: 1200 }} />}
+        {isFinish && <Fireworks autorun={{ speed: 2, duration: 1000 }} />}
       </div>
 
       <Step className="mt-16 md:mt-20">
