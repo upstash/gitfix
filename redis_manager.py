@@ -16,7 +16,7 @@ class Redis_Wrapper:
             self.redis = Redis(url=url, token=token)
         else:
             import redis
-            print("Connecting to fly hosted redis")
+            print("Connecting to fly created redis")
             self.redis= redis.Redis(
                 host=url,
                 port=6379,
