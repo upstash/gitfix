@@ -42,7 +42,7 @@ async function *gitfix(owner: string, repo:string, demo_mode: boolean, config: a
     return  
   }
   
-  yield 'Forking the repository.\n'
+  yield 'Forking the repository.'
   let forkedRepo:GithubAPIWrapper;
   try {
     forkedRepo = await originalRepo.fork()
@@ -121,7 +121,7 @@ async function *gitfix(owner: string, repo:string, demo_mode: boolean, config: a
   let errored =0
   for(let i = 0; i < indexes.length; i ++){
     let index =  indexes[i];
-    yield `Processing ${originalRepo.items[index].path}`;
+    yield `Processing ${originalRepo.items[index].path}\n`;
     let file_content = await originalRepo.getItemContent(index);
     console.log(`Processing ${originalRepo.items[index].path} size : ${file_content.length}`)
     if(file_content.length>50){
@@ -129,7 +129,7 @@ async function *gitfix(owner: string, repo:string, demo_mode: boolean, config: a
       promises.push(
         grammar_correction(file_content, config).then(async function(corrected_content){
           console.log(`Updating ${originalRepo.items[index].path} size : ${file_content.length}`)
-          yields.push(`Updating ${originalRepo.items[index].path}`)
+          yields.push(`Updating ${originalRepo.items[index].path}\n`)
           await forkedRepo.updateFileContent(index, corrected_content)
           await redis.insert(owner, forkedRepo.items[index])
           console.log(`resolving ${originalRepo.items[index].path} size : ${file_content.length}`)
