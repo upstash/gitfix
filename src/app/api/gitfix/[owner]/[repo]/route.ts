@@ -18,7 +18,7 @@ async function *gitfix(owner: string, repo:string, demo_mode: boolean): AsyncGen
   
   //TODO: make the 3 files per user check here 
   
-  yield `Processing the repository ${path}`;
+  yield `Processing the repository ${path}\n`;
   
   let originalRepo = new GithubAPIWrapper(owner,repo,config['github-token'])
   await originalRepo.getItems(true)
@@ -30,19 +30,19 @@ async function *gitfix(owner: string, repo:string, demo_mode: boolean): AsyncGen
   yield logs
   
   if (originalRepo.items.length == 0){
-    yield `Error: Gitfix could not discover any files in the repositoy.
-    Make sure you inputed your repository name correctly and your repository is indexed in Github search engine.
-    If your repository is not indexed, please wait a while until Github indexes your repository.`
+    yield `Error: Gitfix could not discover any files in the repositoy.\n
+    Make sure you inputed your repository name correctly and your repository is indexed in Github search engine.\n
+    If your repository is not indexed, please wait a while until Github indexes your repository.\n`
     return  
   }
   
-  yield 'Forking the repository.'
+  yield 'Forking the repository.\n'
   let forkedRepo:GithubAPIWrapper;
   try {
     forkedRepo = await originalRepo.fork()
     await sleep(500);
   }catch(e){
-    yield "Error: Forking process failed, aborting!"
+    yield "Error: Forking process failed, aborting!\n"
     console.log(e)
     return
   }
@@ -50,14 +50,14 @@ async function *gitfix(owner: string, repo:string, demo_mode: boolean): AsyncGen
   try{
     let unupdatedItems = await redis.getDifference(path, originalRepo.items)
     if (unupdatedItems.length < 1){
-      yield "Gitfix has already corrected all grammar errors in the repository."
+      yield "Gitfix has already corrected all grammar errors in the repository.\n"
       return
     }
     console.log(unupdatedItems)
     originalRepo.items = unupdatedItems
     forkedRepo.items = unupdatedItems
   }catch(e){
-    yield "Error: Cannot connect to Redis, aborting!"
+    yield "Error: Cannot connect to Redis, aborting!\n"
     console.log(e)
     return
   }
@@ -75,12 +75,12 @@ async function *gitfix(owner: string, repo:string, demo_mode: boolean): AsyncGen
     await forkedRepo.createARefFromDefaultBranch("gitfix")
   }catch(e){
     console.log(e)
-    yield `Error: Gitfix could not create a new branch for changes.
-    This is most likely due to delays in completing the forking process on Github's end.
-    Please try again in a minute.`;
+    yield `Error: Gitfix could not create a new branch for changes.\n
+    This is most likely due to delays in completing the forking process on Github's end.\n
+    Please try again in a minute.\n`;
     return;
   }
-  logs = "Selecting files to update.\n Selected files:"
+  logs = "Selecting files to update.\nSelected files:\n"
   fileIndexes.forEach( function(i){
     logs += `\t ${originalRepo.items[i].path}\n`
   })
@@ -107,7 +107,7 @@ async function *gitfix(owner: string, repo:string, demo_mode: boolean): AsyncGen
         }
         ).catch((e) =>{
           console.log(e)
-          yields.push(`Error: File ${originalRepo.items[index].path} is not updated due to limitations in OpenAI API. Please try again in a few minutes.`)
+          yields.push(`Error: File ${originalRepo.items[index].path} is not updated due to limitations in OpenAI API.\nPlease try again in a few minutes.\n`)
           errored += 1;
         })
       ) 
@@ -128,7 +128,7 @@ async function *gitfix(owner: string, repo:string, demo_mode: boolean): AsyncGen
     increments += 1
   }
   if(errored < indexes.length){
-    yield "Success: Creating PR request.";
+    yield "Success: Creating PR request.\n";
     await originalRepo.createPR(forkedRepo);
   }
   
