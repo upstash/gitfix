@@ -27,6 +27,7 @@ def read_config_file():
 def gitfix(owner, repo, printer, demo_mode = False):
     printer.print(f"Processing the repository {owner}/{repo}")
     config = read_config_file()
+    printer.print("Establishing redis connection.")
     redis = Redis_Wrapper(config["upstash-redis-url"], config["upstash-redis-token"], from_fly=config['redis-password'])
     path = f"{owner}/{repo}"
     if demo_mode:
@@ -50,7 +51,6 @@ def gitfix(owner, repo, printer, demo_mode = False):
         printer.print("Forking process failed, aborting!")
         return
   
-    printer.print("Establishing redis connection.")
     try:
         unupdated_items = redis.get_difference(path,original_repo.items)
         if len(unupdated_items) < 1:
