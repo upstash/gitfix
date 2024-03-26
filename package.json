@@ -1,0 +1,25 @@
+{
+  "name": "gitfix-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@upstash/redis": "^1.28.4",
+    "next": "^14.1.3",
+    "openai": "^4.29.1",
+    "react": "^18",
+    "react-dom": "^18",
+    "stream-demux": "^10.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "typescript": "^5"
+  }
+}
