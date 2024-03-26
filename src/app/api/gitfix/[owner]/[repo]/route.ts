@@ -3,11 +3,10 @@ export const maxDuration = 300;
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic'; // always run dynamically
 
-import config from '../../../../../../config.json'
 import GithubAPIWrapper from "./github_api";
 import RedisWrapper from './redis_wrapper';
 import grammar_correction from './grammar_correction';
-async function *gitfix(owner: string, repo:string, demo_mode: boolean): AsyncGenerator{
+async function *gitfix(owner: string, repo:string, demo_mode: boolean, config: any): AsyncGenerator{
   
   let path = owner + '/' + repo;
   const sleep = async (ms: number) => 
@@ -128,7 +127,7 @@ async function *gitfix(owner: string, repo:string, demo_mode: boolean): AsyncGen
     if(file_content.length>50){
       console.log(`create promise for ${originalRepo.items[index].path}`)
       promises.push(
-        grammar_correction(file_content).then(async function(corrected_content){
+        grammar_correction(file_content, config).then(async function(corrected_content){
           console.log(`Updating ${originalRepo.items[index].path} size : ${file_content.length}`)
           yields.push(`Updating ${originalRepo.items[index].path}`)
           await forkedRepo.updateFileContent(index, corrected_content)
@@ -168,14 +167,26 @@ type Params = {
   repo: string
 }
 
+function generate_config_from_environment(): any{
+  let obj:any = {
+    "files-per-run": process.env.FILES_PER_RUN,
+    "github-token": process.env.GITHUB_TOKEN,
+    "upstash-redis-url": process.env.UPSTASH_REDIS_URL,
+    "upstash-redis-token": process.env.UPSTASH_REDIS_TOKEN,
+    "openai-key": process.env.OPENAI_KEY,
+  }
+  return <JSON>obj 
+}
 export async function GET(request: Request, context: { params: Params }) {
   // This encoder will stream your text
   const encoder = new TextEncoder();
   let owner = context.params.owner;
   let repo = context.params.repo;
+  let config = generate_config_from_environment()
+  console.log(config)
   const customReadable = new ReadableStream({
     async start(controller) {
-      for await (let chunk of gitfix(owner, repo, true)) {
+      for await (let chunk of gitfix(owner, repo, true, config)) {
         const chunkData =  encoder.encode(JSON.stringify(chunk));
         controller.enqueue(chunkData);
       }

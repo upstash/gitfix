@@ -1,8 +1,7 @@
 import OpenAI from 'openai';
-import config from '../../../../../../config.json'
 
 
-async function grammar_correction(file_content:string): Promise<string>  {
+async function grammar_correction(file_content:string, config:any): Promise<string>  {
     let openai = new OpenAI({apiKey: config['openai-key']});
     const completion = await openai.chat.completions.create({
       messages: [
