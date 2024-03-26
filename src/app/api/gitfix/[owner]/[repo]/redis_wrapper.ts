@@ -39,7 +39,7 @@ class RedisWrapper {
 
     async getMembers(setName: string): Promise<any[]> {
         const members = await this.redis.smembers(setName);
-        return members.map(item => JSON.parse(item));
+        return members;
     }
 }
 
