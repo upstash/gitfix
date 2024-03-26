@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { useEffect } from 'react'
 import { useFormState, useFormStatus } from 'react-dom'
 import { Profile, Repository } from 'lib/types'
 import { Step, StepContent, StepItem, StepNumber, StepTitle } from './step-list'
@@ -17,7 +18,6 @@ import { getRepositories } from 'app/actions'
 import Fireworks from 'react-canvas-confetti/dist/presets/fireworks'
 import Fuse from 'fuse.js'
 import { useToast } from 'components/ui/use-toast'
-import { useEffect } from 'react'
 
 export default function Flow() {
   const { toast } = useToast()
@@ -28,7 +28,7 @@ export default function Flow() {
   const [query, setQuery] = React.useState<string>('')
   const [repo, setRepo] = React.useState<undefined | Repository>(undefined)
 
-  const [streamText, setStreamText] = React.useState<{ text: string }[]>([])
+  const [streamText, setStreamText] = React.useState<string>('')
   const [isStream, setStream] = React.useState<boolean>(false)
   const [isFinish, setFinish] = React.useState<boolean>(false)
 
@@ -70,7 +70,7 @@ export default function Flow() {
     }
 
     try {
-      setStreamText([])
+      setStreamText('')
       setStream(true)
       setFinish(false)
 
@@ -91,23 +91,53 @@ export default function Flow() {
           break
         }
         const decoder = new TextDecoder()
-        const newData = decoder.decode(value)
-        const parseData = JSON.parse(newData.replace(/\n/g, ''))
-        console.log(parseData)
-        setStreamText(prevState => [...prevState, parseData])
+        const a = decoder.decode(value)
+        console.log('a)', a)
+        const b = fixStreamText(a)
+        console.log('b)', b)
+        setStreamText(prevState => prevState + b)
       }
     } catch (error) {
       console.error(error)
     } finally {
       setStream(false)
-      setFinish(true)
     }
   }
+
+  useEffect(() => {
+    // possible error messages:
+    // - Error: Gitfix could not discover any files in the repositoy. Make sure you inputed your repository name
+    // correctly and your repository is indexed in Github search engine.
+    // If your repository is not indexed, please wait a while until Github indexes your repository.
+    // - Error: Forking process failed, aborting!
+    // - Error: Cannot connect to Redis, aborting!
+    // - Error: Gitfix could not create a new branch for changes. This is most likely due to delays in completing the
+    // forking process on Github's end. Please try again in a minute.
+    // - Error: File ${originalRepo.items[index].path} is not updated due to limitations in OpenAI API. Please try
+    // again in a few minutes.`
+
+    // possible success messages:
+    // - Success: Creating PR request.
+    // - All grammar errors in the repository are previously corrected by GitFix.
+
+    if (
+      streamText.includes('Success:') ||
+      streamText.includes('previously corrected')
+    ) {
+      setFinish(true)
+    }
+  }, [streamText])
+
+  useEffect(() => {
+    const formData = new FormData()
+    formData.append('username', 'ademilter')
+    dispatch(formData)
+  }, [])
 
   return (
     <>
       <div className="fixed inset-0 z-10 pointer-events-none">
-        {isFinish && <Fireworks autorun={{ speed: 2, duration: 1000 }} />}
+        {isFinish && <Fireworks autorun={{ speed: 3, duration: 1000 }} />}
       </div>
 
       <Step className="mt-16 md:mt-20">
@@ -184,7 +214,7 @@ export default function Flow() {
                     variant="outline"
                     onClick={() => {
                       setRepo(undefined)
-                      setStreamText([])
+                      setStreamText('')
                     }}
                   >
                     Change Repository
@@ -238,16 +268,18 @@ export default function Flow() {
             <StepContent>
               <Content className="px-5">
                 <pre className="w-full text-sm text-pretty whitespace-pre-wrap">
-                  {streamText.map((o, i) => (
-                    <span
-                      key={i}
-                      className="flex w-full mt-1 last:font-semibold last:text-emerald-600"
-                    >
-                      {fixStreamText(o.text)}
-                    </span>
-                  ))}
+                  {streamText.split('\n').map((o, i) =>
+                    ['', ' ', '.'].includes(o) ? null : (
+                      <span
+                        key={i}
+                        className="flex w-full min-h-6 last:font-semibold last:text-emerald-600"
+                      >
+                        {o.replace(/"/g, '')}
+                      </span>
+                    )
+                  )}
                   {isStream && (
-                    <span className="mt-1 flex items-center gap-2 font-semibold text-emerald-600">
+                    <span className="flex items-center gap-2 font-semibold text-emerald-600">
                       <LoaderCircle size={18} className="animate-spin" />
                       Processing...
                     </span>

@@ -6,10 +6,13 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function fixStreamText(value: string) {
+  if (!value) return value
+
   return value
-    // .replace(/\s+/g, ' ') // replace multiple spaces with single space
-    .replace(/↵+/g, '\n') // replace ↵ with new line
-    .replace(/\t/g, ' ✓ ') // replace tab with checkmark
+    .replace(/""/g, '\n')
+    .replace(/\\n /g, '\n')
+    .replace(/\\n/g, '\n')
+    .replace(/\\t/g, '\n ✓')
     .trim()
 }
 
