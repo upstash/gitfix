@@ -105,7 +105,12 @@ async function *gitfix(owner: string, repo:string, demo_mode: boolean, config: a
       fileIndexes.add(Math.floor(Math.random() * (originalRepo.items.length)))
     }
   }
-  yield "Selecting files to update.\n"
+  if(fileIndexes.size > 0){
+    yield "Selecting files to update.\n"
+  }else{
+    yield "Error: Gitfix could not find an unupdated file that is sufficiently long(more than 100 chars). Aborting.\n"
+    return
+  }
   console.log(logs)
   const indexes = Array.from(fileIndexes);
   yield "Selected files:\n"
