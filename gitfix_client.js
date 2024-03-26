@@ -37,11 +37,14 @@ async function sendRequest(){
         }
         const decoder = new TextDecoder()
         const a = decoder.decode(value)
+
+        //skip null packages 
         if(a.length < 5){
             continue
         }
         // console.log(a)
         let b = fixStreamText(a)
+        // remove " chars
         b = b.split('\"').join('')
         console.log(b)
       }
