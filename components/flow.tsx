@@ -16,8 +16,12 @@ import { LoaderCircle } from 'lucide-react'
 import { getRepositories } from 'app/actions'
 import Fireworks from 'react-canvas-confetti/dist/presets/fireworks'
 import Fuse from 'fuse.js'
+import { useToast } from 'components/ui/use-toast'
+import { useEffect } from 'react'
 
 export default function Flow() {
+  const { toast } = useToast()
+
   const [result, dispatch] = useFormState(getRepositories, undefined)
   const { pending } = useFormStatus()
 
@@ -37,6 +41,24 @@ export default function Flow() {
   })
 
   const filterData = query ? fuse.search(query).map(o => o.item) : data
+
+  useEffect(() => {
+    if (!result) return
+    if (result.type === ResultCode.EnvironmentError) {
+      toast({
+        variant: 'destructive',
+        title: 'Environment Error',
+        description: 'Please set the GITHUB_TOKEN environment variable'
+      })
+    }
+    if (result.type === ResultCode.Error) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to fetch repositories'
+      })
+    }
+  }, [result])
 
   async function fixRepo(username: string, repo: string): Promise<any> {
     if (!username || !repo) {
@@ -75,7 +97,7 @@ export default function Flow() {
         {isFinish && <Fireworks autorun={{ speed: 2, duration: 1200 }} />}
       </div>
 
-      <Step className="mt-16">
+      <Step className="mt-16 md:mt-20">
         {/* Github profile */}
         <StepItem>
           <StepNumber />

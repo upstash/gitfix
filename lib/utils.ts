@@ -9,5 +9,6 @@ export enum ResultCode {
   InvalidUsername = 'INVALID_USERNAME',
   EmptyRepos = 'EMPTY_REPOS',
   Success = 'SUCCESS',
-  Error = 'ERROR'
+  Error = 'ERROR',
+  EnvironmentError = 'ENVIRONMENT_ERROR'
 }

@@ -29,6 +29,11 @@ export async function getRepositories(
       return { type: ResultCode.InvalidUsername, repos: [] }
     }
 
+    const token = process.env.GITHUB_ACCESS_TOKENS
+    if (!token) {
+      return { type: ResultCode.EnvironmentError, repos: [] }
+    }
+
     const response = await fetch(
       `https://api.github.com/users/${username}/repos`,
       {
