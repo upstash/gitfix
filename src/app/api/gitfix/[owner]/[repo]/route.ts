@@ -14,6 +14,13 @@ async function *gitfix(owner: string, repo:string, demo_mode: boolean): AsyncGen
   (new Promise(resolve => setTimeout(resolve, ms)))
   let redis = new RedisWrapper(config["upstash-redis-url"], config["upstash-redis-token"])
 
+  if (demo_mode){
+    let prev_changed_files = await redis.getMembers(owner)
+    if (prev_changed_files.length > 3){
+      yield "Error: Gitfix already corrected 3 files in repositories of this user in demo mode. Please run gitfix in your local for unlimited use. See https://github.com/upstash/gitfix for more."
+      return
+    }
+  }
 
   
   //TODO: make the 3 files per user check here 
@@ -46,7 +53,6 @@ async function *gitfix(owner: string, repo:string, demo_mode: boolean): AsyncGen
     console.log(e)
     return
   }
-  console.log("line 46")
   try{
     let unupdatedItems = await redis.getDifference(path, originalRepo.items)
     if (unupdatedItems.length < 1){
@@ -61,15 +67,8 @@ async function *gitfix(owner: string, repo:string, demo_mode: boolean): AsyncGen
     console.log(e)
     return
   }
-  console.log("line 61")
   //TODO: smarter file selection     
   
-  let fileIndexes: Set<number>= new Set();
-  while(fileIndexes.size < Math.min(config['files-per-run'], originalRepo.items.length)){
-    fileIndexes.add(Math.floor(Math.random() * (originalRepo.items.length)))
-  }
-  console.log(originalRepo.items)
-  console.log("line 74")
   try{
     forkedRepo.details['default_branch'] = originalRepo.details['default_branch'];
     await forkedRepo.createARefFromDefaultBranch("gitfix")
@@ -80,13 +79,44 @@ async function *gitfix(owner: string, repo:string, demo_mode: boolean): AsyncGen
     Please try again in a minute.\n`;
     return;
   }
-  logs = "Selecting files to update.\nSelected files:\n"
-  fileIndexes.forEach( function(i){
-    logs += `\t ${originalRepo.items[i].path}\n`
-  })
+  
+  let fileIndexes: Set<number>= new Set();
+  if(demo_mode){
+    let promises:Promise<string | void>[] = [];
+    let sizes:{ [id: number] : number; [size: string] : number }[]= [];
+    for(let i = 0; i < originalRepo.items.length; i ++){
+      promises.push(
+        originalRepo.getItemContent(i).then(function (content){
+          sizes.push({size: content.length, id: i});
+        })
+        )
+      }
+      await Promise.all(promises);
+      sizes.sort((a,b) => a.size - b.size)
+      console.log(sizes)
+      let index = 0;
+      for(let i = 0; i < sizes.length; i++ ){
+        console.log(sizes[i])
+        if(sizes[i].size > 100 && sizes[i].size < 15000){
+          fileIndexes.add(sizes[i].id);
+        }
+        if(fileIndexes.size >= config['files-per-run']){
+          break;
+        }
+      }
+  }
+  else{
+    while(fileIndexes.size < Math.min(config['files-per-run'], originalRepo.items.length)){
+      fileIndexes.add(Math.floor(Math.random() * (originalRepo.items.length)))
+    }
+  }
+  yield "Selecting files to update.\n"
   console.log(logs)
-  yield logs
   const indexes = Array.from(fileIndexes);
+  yield "Selected files:\n"
+  for(let i = 0; i < indexes.length; i ++){
+    yield `\t${originalRepo.items[indexes[i]].path}\n`
+  }
   let promises:Promise<void>[] = []
   let yields:string[] = []
   let errored =0
@@ -102,7 +132,7 @@ async function *gitfix(owner: string, repo:string, demo_mode: boolean): AsyncGen
           console.log(`Updating ${originalRepo.items[index].path} size : ${file_content.length}`)
           yields.push(`Updating ${originalRepo.items[index].path}`)
           await forkedRepo.updateFileContent(index, corrected_content)
-          await redis.insert(path, forkedRepo.items[index])
+          await redis.insert(owner, forkedRepo.items[index])
           console.log(`resolving ${originalRepo.items[index].path} size : ${file_content.length}`)
         }
         ).catch((e) =>{
