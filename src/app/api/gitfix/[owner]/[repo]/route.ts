@@ -37,7 +37,7 @@ export async function GET(request: Request, context: { params: Params }) {
     },
   });
   return new Response(customReadable, {
-    headers: { 'Content-Type': 'text/html', 
+    headers: { 'Content-Type': 'text/html; charset=utf-8', 
               'Cache-Control': 'no-cache',
               'Access-Control-Allow-Credentials': 'true',
               'Access-Control-Allow-Origin': '*',
