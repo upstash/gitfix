@@ -2,6 +2,7 @@ import React from 'react'
 import Header from 'components/header'
 import Footer from 'components/footer'
 import Flow from 'components/flow'
+import { Toaster } from 'components/ui/toaster'
 
 export default async function Home() {
   return (
@@ -9,6 +10,8 @@ export default async function Home() {
       <Header />
       <Flow />
       <Footer />
+
+      <Toaster />
     </main>
   )
 }
