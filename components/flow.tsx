@@ -8,7 +8,7 @@ import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { ScrollArea } from './ui/scroll-area'
 import { Table, TableBody, TableCell, TableRow } from './ui/table'
-import { cn, ResultCode } from 'lib/utils'
+import { cn, fixStreamText, ResultCode } from 'lib/utils'
 import IconGitHub from './icon-github'
 import Image from 'next/image'
 import Content from './content'
@@ -26,7 +26,7 @@ export default function Flow() {
   const { pending } = useFormStatus()
 
   const [query, setQuery] = React.useState<string>('')
-  const [repo, setRepo] = React.useState<Repository>()
+  const [repo, setRepo] = React.useState<undefined | Repository>(undefined)
 
   const [streamText, setStreamText] = React.useState<{ text: string }[]>([])
   const [isStream, setStream] = React.useState<boolean>(false)
@@ -40,10 +40,16 @@ export default function Flow() {
     keys: ['name']
   })
 
+  console.log(streamText)
+
   const filterData = query ? fuse.search(query).map(o => o.item) : data
 
   useEffect(() => {
+    setQuery('')
+    setRepo(undefined)
+
     if (!result) return
+
     if (result.type === ResultCode.EnvironmentError) {
       toast({
         variant: 'destructive',
@@ -65,30 +71,37 @@ export default function Flow() {
       return alert('Please enter a valid username and repo')
     }
 
-    setFinish(false)
-    const response = await fetch(`https://gitfix.fly.dev/${username}/${repo}`)
+    try {
+      setStreamText([])
+      setStream(true)
+      setFinish(false)
 
-    if (!response.body) {
-      return alert('No response from server')
-    }
+      const response = await fetch(`https://gitfix.fly.dev/${username}/${repo}`)
 
-    const reader = response.body.getReader()
-    setStream(true)
-
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) {
-        setStream(false)
-        break
+      if (!response.body) {
+        return alert('No response from server')
       }
-      const decoder = new TextDecoder()
-      const newData = decoder.decode(value)
-      const parseData = JSON.parse(newData.replace(/\n/g, ''))
-      console.log(parseData)
-      setStreamText(prevState => [...prevState, parseData])
-    }
 
-    setFinish(true)
+      const reader = response.body.getReader()
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) {
+          setStream(false)
+          break
+        }
+        const decoder = new TextDecoder()
+        const newData = decoder.decode(value)
+        const parseData = JSON.parse(newData.replace(/\n/g, ''))
+        console.log(parseData)
+        setStreamText(prevState => [...prevState, parseData])
+      }
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setStream(false)
+      setFinish(true)
+    }
   }
 
   return (
@@ -101,7 +114,7 @@ export default function Flow() {
         {/* Github profile */}
         <StepItem>
           <StepNumber />
-          <StepTitle>Login with GitHub</StepTitle>
+          <StepTitle>Select a Github Account</StepTitle>
           <StepContent>
             <Content>
               {user ? (
@@ -118,7 +131,7 @@ export default function Flow() {
                   <form action={dispatch} className="ml-auto flex">
                     <input hidden name="username" />
                     <Button size="sm" variant="outline" disabled={pending}>
-                      Change username
+                      Change Github Account
                     </Button>
                   </form>
                 </>
@@ -139,7 +152,7 @@ export default function Flow() {
                       {pending && (
                         <LoaderCircle size={20} className="animate-spin" />
                       )}
-                      Get repositories
+                      Get Repositories
                     </Button>
                   </form>
                 </>
@@ -158,9 +171,13 @@ export default function Flow() {
                 <Content>
                   <div className="flex items-center gap-2 w-full">
                     <IconGitHub height={28} />
-                    <span className="font-medium">
+                    <a
+                      className="font-medium underline decoration-zinc-500/50"
+                      href={repo.html_url}
+                      target="_blank"
+                    >
                       {repo.html_url.replace('https://', '')}
-                    </span>
+                    </a>
                   </div>
                   <Button
                     size="sm"
@@ -170,7 +187,7 @@ export default function Flow() {
                       setStreamText([])
                     }}
                   >
-                    Change repository
+                    Change Repository
                   </Button>
                 </Content>
               ) : (
@@ -198,7 +215,7 @@ export default function Flow() {
                                     await fixRepo(user.login, repo.name)
                                   }}
                                 >
-                                  Fix it
+                                  Fix!
                                 </Button>
                               </TableCell>
                             </TableRow>
@@ -219,22 +236,31 @@ export default function Flow() {
           <StepTitle>Creating PR Request</StepTitle>
           {repo && (
             <StepContent>
-              <Content className="px-5✓">
+              <Content className="px-5">
                 <pre className="w-full text-sm text-pretty whitespace-pre-wrap">
                   {streamText.map((o, i) => (
                     <span
                       key={i}
-                      className="flex w-full mt-1 last:text-emerald-500"
+                      className="flex w-full mt-1 last:font-semibold last:text-emerald-600"
                     >
-                      {o.text.replace(/\n /g, '\n').replace(/\t/g, ' ✓ ')}
+                      {fixStreamText(o.text)}
                     </span>
                   ))}
                   {isStream && (
-                    <span className="mt-1 flex items-center gap-2 text-emerald-500">
-                      <LoaderCircle size={20} className="animate-spin" />
+                    <span className="mt-1 flex items-center gap-2 font-semibold text-emerald-600">
+                      <LoaderCircle size={18} className="animate-spin" />
                       Processing...
                     </span>
                   )}
+                  {/*{isFinish && (*/}
+                  {/*  <a*/}
+                  {/*    className="mt-4 flex text-emerald-600"*/}
+                  {/*    href={repo.html_url}*/}
+                  {/*    target="_blank"*/}
+                  {/*  >*/}
+                  {/*    <span className="underline font-semibold">{repo.html_url.replace('https://', '')}</span> has been fixed!*/}
+                  {/*  </a>*/}
+                  {/*)}*/}
                 </pre>
               </Content>
             </StepContent>

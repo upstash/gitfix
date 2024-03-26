@@ -19,7 +19,7 @@ export async function getRepositories(
 
     const parsedCredentials = z
       .object({
-        username: z.string().min(1)
+        username: z.string().min(1).trim()
       })
       .safeParse({
         username
