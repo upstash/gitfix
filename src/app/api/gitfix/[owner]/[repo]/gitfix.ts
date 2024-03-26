@@ -1,6 +1,7 @@
 import GithubAPIWrapper from "./github_api";
 import RedisWrapper from './redis_wrapper';
 import grammar_correction from './grammar_correction';
+
 async function *gitfix(owner: string, repo:string, demo_mode: boolean, config: any): AsyncGenerator{
   
   let path = owner + '/' + repo;
@@ -37,7 +38,7 @@ async function *gitfix(owner: string, repo:string, demo_mode: boolean, config: a
     return  
   }
   
-  yield 'Forking the repository.\n'
+  yield 'Forking the repository. \n'
   let forkedRepo:GithubAPIWrapper;
   try {
     forkedRepo = await originalRepo.fork()
