@@ -12,7 +12,7 @@ async function *gitfix(owner: string, repo:string, demo_mode: boolean, config: a
   if (demo_mode){
     let prev_changed_files = await redis.getMembers(owner)
     if (prev_changed_files.length > 3){
-      yield "Error: Gitfix already corrected 3 files in repositories of this user in demo mode. Please run gitfix in your local for unlimited use. See https://github.com/upstash/gitfix for more."
+      yield "Error: Gitfix already corrected 3 files in repositories of this user in demo mode. Please run gitfix in your local for unlimited use. See https://github.com/upstash/gitfix for more.\n\n"
       return
     }
   }
@@ -20,45 +20,45 @@ async function *gitfix(owner: string, repo:string, demo_mode: boolean, config: a
   
   //TODO: make the 3 files per user check here 
   
-  yield `Processing the repository ${path}\n`;
+  yield `Processing the repository ${path}\n\n`;
   
   let originalRepo = new GithubAPIWrapper(owner,repo,config['github-token'])
   await originalRepo.getItems(true)
   
-  let logs = "Discovering items:\n"
+  let logs = "Discovering items:\n\n"
   for( let i = 0 ; i < originalRepo.items.length ; ++i ) {
-    logs += originalRepo.items[i].path + '\n';
+    logs += originalRepo.items[i].path + '\n\n';
   }
   yield logs
   
   if (originalRepo.items.length == 0){
-    yield `Error: Gitfix could not discover any files in the repositoy.\n
-    Make sure you inputed your repository name correctly and your repository is indexed in Github search engine.\n
-    If your repository is not indexed, please wait a while until Github indexes your repository.\n`
+    yield `Error: Gitfix could not discover any files in the repositoy.
+    Make sure you inputed your repository name correctly and your repository is indexed in Github search engine.
+    If your repository is not indexed, please wait a while until Github indexes your repository.\n\n`
     return  
   }
   
-  yield 'Forking the repository. \n'
+  yield 'Forking the repository. \n\n'
   let forkedRepo:GithubAPIWrapper;
   try {
     forkedRepo = await originalRepo.fork()
     await sleep(500);
   }catch(e){
-    yield "Error: Forking process failed, aborting!\n"
+    yield "Error: Forking process failed, aborting!\n\n"
     console.log(e)
     return
   }
   try{
     let unupdatedItems = await redis.getDifference(path, originalRepo.items)
     if (unupdatedItems.length < 1){
-      yield "Gitfix has already corrected all grammar errors in the repository.\n"
+      yield "Gitfix has already corrected all grammar errors in the repository.\n\n"
       return
     }
     console.log(unupdatedItems)
     originalRepo.items = unupdatedItems
     forkedRepo.items = unupdatedItems
   }catch(e){
-    yield "Error: Cannot connect to Redis, aborting!\n"
+    yield "Error: Cannot connect to Redis, aborting!\n\n"
     console.log(e)
     return
   }
@@ -106,16 +106,16 @@ async function *gitfix(owner: string, repo:string, demo_mode: boolean, config: a
     }
   }
   if(fileIndexes.size > 0){
-    yield "Selecting files to update.\n"
+    yield "Selecting files to update.\n\n"
   }else{
     yield "Error: Gitfix could not find an unupdated file that is sufficiently long(more than 100 chars). Aborting.\n"
     return
   }
   console.log(logs)
   const indexes = Array.from(fileIndexes);
-  yield "Selected files:\n"
+  yield "Selected files:\n\n"
   for(let i = 0; i < indexes.length; i ++){
-    yield `\t${originalRepo.items[indexes[i]].path}\n`
+    yield `\t${originalRepo.items[indexes[i]].path}\n\n`
   }
   let promises:Promise<void>[] = []
   let yields:string[] = []
@@ -124,13 +124,13 @@ async function *gitfix(owner: string, repo:string, demo_mode: boolean, config: a
     let index =  indexes[i];
     yield `Processing ${originalRepo.items[index].path}`;
     let file_content = await originalRepo.getItemContent(index);
-    console.log(`Processing ${originalRepo.items[index].path} size : ${file_content.length}`)
+    console.log(`Processing ${originalRepo.items[index].path} size : ${file_content.length}\n\n`)
     if(file_content.length>50){
       console.log(`create promise for ${originalRepo.items[index].path}`)
       promises.push(
         grammar_correction(file_content, config).then(async function(corrected_content){
           console.log(`Updating ${originalRepo.items[index].path} size : ${file_content.length}`)
-          yields.push(`Updating ${originalRepo.items[index].path}`)
+          yields.push(`Updating ${originalRepo.items[index].path}\n\n`)
           await forkedRepo.updateFileContent(index, corrected_content)
           await redis.insert(owner, forkedRepo.items[index])
           console.log(`resolving ${originalRepo.items[index].path} size : ${file_content.length}`)
