@@ -33,7 +33,7 @@ export async function GET(request: Request, context: { params: Params }) {
   console.log(config)
   const customReadable = new ReadableStream({
     async start(controller) {
-      for await (let chunk of gitfix(owner, repo, true, gitfix_config)) {
+      for await (let chunk of gitfix(owner, repo, false, gitfix_config)) {
         const chunkData =  encoder.encode(JSON.stringify(chunk));
         controller.enqueue(chunkData);
       }
