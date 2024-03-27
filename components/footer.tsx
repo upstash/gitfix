@@ -1,45 +1,32 @@
+import ALink from './link'
+
 export default function Footer() {
   return (
     <footer
-      className="border-t text-center border-t-zinc-100
-        dark:border-t-zinc-900 pt-10 mt-20 space-y-4"
+      className="border-t text-center pt-16 mt-20 space-y-4
+      text-zinc-700 dark:text-zinc-400
+      border-t-zinc-100 dark:border-t-zinc-900"
     >
       <p>
         Built using{' '}
-        <a
-          href="https://openai.com"
-          target="_blank"
-          className="underline decoration-zinc-300"
-        >
+        <ALink href="https://openai.com" target="_blank">
           OpenAI
-        </a>
+        </ALink>
         ,{' '}
-        <a
-          href="http://upstash.com"
-          target="_blank"
-          className="underline decoration-zinc-300"
-        >
+        <ALink href="http://upstash.com" target="_blank">
           Upstash Redis
-        </a>{' '}
+        </ALink>{' '}
         and{' '}
-        <a
-          href="http://vercel.com/"
-          target="_blank"
-          className="underline decoration-zinc-300"
-        >
+        <ALink href="http://vercel.com/" target="_blank">
           Vercel
-        </a>
+        </ALink>
         .
       </p>
 
       <p>
-        <a
-          href="https://github.com/upstash/gitfix"
-          target="_blank"
-          className="underline decoration-zinc-300"
-        >
+        <ALink href="https://github.com/upstash/gitfix" target="_blank">
           Source Code on GitHub
-        </a>
+        </ALink>
       </p>
 
       <p>

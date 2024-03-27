@@ -19,6 +19,7 @@ import Fireworks from 'react-canvas-confetti/dist/presets/fireworks'
 import Fuse from 'fuse.js'
 import { useToast } from 'components/ui/use-toast'
 import Markdown from 'markdown-to-jsx'
+import twColors from 'tailwindcss/colors'
 
 export default function Flow() {
   const { toast } = useToast()
@@ -122,10 +123,28 @@ export default function Flow() {
     dispatch(formData)
   }, [])
 
+  const decorateOptions = defaultOptions => {
+    return {
+      ...defaultOptions,
+      colors: [
+        twColors.emerald['300'],
+        twColors.yellow['400'],
+        twColors.emerald['500'],
+        twColors.yellow['600'],
+        twColors.emerald['700']
+      ]
+    }
+  }
+
   return (
     <>
       <div className="fixed inset-0 z-10 pointer-events-none">
-        {isFinish && <Fireworks autorun={{ speed: 3, duration: 1000 }} />}
+        {isFinish && (
+          <Fireworks
+            autorun={{ speed: 2, duration: 800 }}
+            decorateOptions={decorateOptions}
+          />
+        )}
       </div>
 
       <Step className="mt-16 md:mt-20">
@@ -258,9 +277,11 @@ export default function Flow() {
                 className={cn(
                   'px-6',
                   streamText.includes('Error:') &&
-                    'bg-red-500/5 text-red-800 border-red-500/30',
+                    'bg-red-500/5 text-red-800 border-red-500/30 ' +
+                      'dark:bg-red-500/5 dark:text-red-400 dark:border-red-500/20',
                   streamText.includes('Success:') &&
-                    'bg-emerald-500/5 text-emerald-800 border-emerald-500/30'
+                    'bg-emerald-500/5 text-emerald-800 border-emerald-500/30' +
+                      'dark:bg-emerald-500/5 dark:text-emerald-400 dark:border-emerald-500/20'
                 )}
               >
                 <pre className="w-full font-mono text-pretty whitespace-pre-wrap">
@@ -279,7 +300,7 @@ export default function Flow() {
                   </Markdown>
 
                   {isStream && (
-                    <span className="flex items-center gap-2 font-semibold text-emerald-800">
+                    <span className="flex items-center gap-2 text-emerald-800 dark:text-emerald-500">
                       <LoaderCircle size={18} className="animate-spin" />
                       Processing...
                     </span>
