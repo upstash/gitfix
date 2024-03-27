@@ -16,54 +16,59 @@ export default function FlowStep1({
 }: {
   dispatch: (payload: FormData) => void
 }) {
-  const { pending } = useFormStatus()
-  const { user } = store()
-
   return (
     <StepItem>
       <StepNumber />
       <StepTitle>Select a Github Account</StepTitle>
       <StepContent>
         <Content>
-          {user ? (
-            <>
-              <Image
-                src={user.avatar_url}
-                alt={user.login}
-                width={32}
-                height={32}
-                className="rounded-full"
-              />
-              <span className="font-medium">{user.login}</span>
-
-              <form action={dispatch} className="ml-auto flex">
-                <input hidden name="username" />
-                <Button size="sm" variant="outline" disabled={pending}>
-                  Change Github Account
-                </Button>
-              </form>
-            </>
-          ) : (
-            <>
-              <IconGitHub height={32} />
-              <form action={dispatch} className="flex items-center grow gap-2">
-                <Input
-                  name="username"
-                  className="grow"
-                  placeholder="username"
-                  disabled={pending}
-                />
-                <Button size="sm" disabled={pending}>
-                  {pending && (
-                    <LoaderCircle size={20} className="animate-spin" />
-                  )}
-                  Get Repositories
-                </Button>
-              </form>
-            </>
-          )}
+          <form action={dispatch} className="flex w-full items-center gap-2">
+            <Form />
+          </form>
         </Content>
       </StepContent>
     </StepItem>
+  )
+}
+
+function Form() {
+  const { pending } = useFormStatus()
+  const { user } = store()
+
+  return user ? (
+    <>
+      <Image
+        src={user.avatar_url}
+        alt={user.login}
+        width={32}
+        height={32}
+        className="rounded-full"
+      />
+      <span className="font-medium">{user.login}</span>
+
+      <div className="ml-auto flex">
+        <input hidden name="username" />
+        <Button size="sm" variant="outline" disabled={pending}>
+          {pending && <LoaderCircle size={20} className="animate-spin mr-2" />}
+          Change Github Account
+        </Button>
+      </div>
+    </>
+  ) : (
+    <>
+      <IconGitHub height={32} />
+      <div className="flex items-center grow gap-2">
+        <Input
+          name="username"
+          className="grow"
+          placeholder="username"
+          disabled={pending}
+        />
+        <Button size="sm" disabled={pending}>
+          {pending && <LoaderCircle size={20} className="animate-spin mr-2" />}
+          Get Repositories
+        </Button>
+      </div>
+    </>
   )
 }
