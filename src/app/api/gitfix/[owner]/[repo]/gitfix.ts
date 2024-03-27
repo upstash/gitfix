@@ -115,7 +115,7 @@ async function *gitfix(owner: string, repo:string, demo_mode: boolean, config: a
   const indexes = Array.from(fileIndexes);
   yield "Selected files:\n\n"
   for(let i = 0; i < indexes.length; i ++){
-    yield `\t${originalRepo.items[indexes[i]].path}\n\n`
+    yield `- ${originalRepo.items[indexes[i]].path}\n\n`
   }
   let promises:Promise<void>[] = []
   let yields:string[] = []
