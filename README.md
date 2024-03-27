@@ -19,7 +19,7 @@ For python implementation, check out gitfix-python folder under this repository.
 ## How to Use
  To use GitFix, you can simply run `npm i` and create a config.json file in the root folder. 
  Afterwards, you can start your own gitfix server via `npm run dev`.
- Then using `node gitfix_client.js` will fix the grammar errors given in the target repository given in the config.json.
+ Then using `node gitfix_client.js` will fix the grammar errors in the target repository given in the config.json.
 
 ### Requirements:
 
