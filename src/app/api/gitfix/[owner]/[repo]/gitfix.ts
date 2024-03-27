@@ -122,7 +122,7 @@ async function *gitfix(owner: string, repo:string, demo_mode: boolean, config: a
   let errored =0
   for(let i = 0; i < indexes.length; i ++){
     let index =  indexes[i];
-    yield `Processing ${originalRepo.items[index].path}`;
+    yield `Processing ${originalRepo.items[index].path}\n\n`;
     let file_content = await originalRepo.getItemContent(index);
     console.log(`Processing ${originalRepo.items[index].path} size : ${file_content.length}\n\n`)
     if(file_content.length>50){
