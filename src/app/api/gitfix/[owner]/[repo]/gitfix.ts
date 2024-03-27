@@ -27,7 +27,7 @@ async function *gitfix(owner: string, repo:string, demo_mode: boolean, config: a
   
   let logs = "Discovering items:\n\n"
   for( let i = 0 ; i < originalRepo.items.length ; ++i ) {
-    logs += originalRepo.items[i].path + '\n\n';
+    logs += '- ' + originalRepo.items[i].path + '\n\n';
   }
   yield logs
   
