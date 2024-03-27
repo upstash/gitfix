@@ -9,22 +9,27 @@ GitFix is a grammar correction application that uses GPT4 to correct grammar err
 
 ### Tech Stack
 
-- Backend: **Python 3.10**
+- Backend: **Python 3.10** or **NodeJS22**
 - AI Integration: **OpenAI API**
 - Data Storage: **[Upstash Redis](https://upstash.com/docs/redis/overall/getstarted)**
-- Deployment Option: **[Fly.io](https://fly.io)**
+- Deployment Options: **[Vercel](https://vercel.com)** or **[Fly.io](https://fly.io)**
+
+For python implementation, check out gitfix-python folder under this repository.
 
 ## How to Use
- To use GitFix, you can simply run `pip install -r requirements.txt` and create a config.yaml file in the same folder as GitFix.py. Then, you are ready to go!
+ To use GitFix, you can simply run `npm i` and create a config.json file in the root folder. 
+ Afterwards, you can start your own gitfix server via `npm run dev`.
+ Then using `node gitfix_client.js` will fix the grammar errors given in the target repository given in the config.json.
 
 ### Requirements:
 
- - Python>3.10
+ - NodeJS 22
  - Having a public repository
  - An Upstash Redis database
  - OpenAI API key
+ - Github API token with write permissions
 
-### Contents of the config file
+### Contents of the config.json file
 
 - github-repo: Target repository which GitFix will search for grammar errors.
 
@@ -40,7 +45,7 @@ GitFix is a grammar correction application that uses GPT4 to correct grammar err
 
 - openai-key: OpenAI API key
 
- You can see an example config file in the example_config.yaml.
+ You can see an example config file in the config.json in this repository.
 
 ### Indexing Your Repository
 
@@ -74,19 +79,17 @@ If search results in your .md files, your repo is ready to go. Otherwise, you sh
 
 ### Deploy It Yourself
 
-To run the gitfix server, you can simply create a docker image using our Dockerfile. During this process, docker copies the currently existing config file.
+You can directly create a Vercel Project for free! For more see [deploying github repostiroes with Vercel](https://vercel.com/docs/deployments/git)
+In your repository, you should provide the contents of the config.json file as environment variables.
+Following provides a matching between config.json content and required environment variables.
 
-Afterwards, you can use that image to deploy to any serverless providers which supports streaming with python applications.
-
-This part is tricky, as there are not many hosting platforms which supports streaming with Python including Lambda(due to bugs in Lambda adapter) and Vercel. To host our app, we preferred **[Fly.io](https://fly.io)** as it provides this rare feature.
-
-To use fly, you should install fly cli, named flyctl. You can check [this](**[Fly.io](https://fly.io)**) tutorial for installation.
-
-To deploy gitfix, you can simply run the following commands:
-
-```bash
-fly auth login
-fly launch
+```
+GITFIX_USE_ENV=true => to instruct gitfix to read environment variables instead of config.json. Existence of config.json file is still required to compile typescript.
+ "files-per-run"=> FILES_PER_RUN
+    "github-token"=> GITHUB_TOKEN
+    "upstash-redis-url"=> process.env.UPSTASH_REDIS_URL
+    "upstash-redis-token"=> process.env.UPSTASH_REDIS_TOKEN
+    "openai-key": => OPENAI_KEY
 ```
 
 ### Contributing
@@ -103,9 +106,9 @@ In the future, we would like to partition the file content to contextually coher
 
 ---
 
-###### Enable Unindexed Repositories:
+###### Enable Unindexed and Private Repositories:
 
-Our current interaction scheme with GitHub API requires the target repo to be indexed in the Github Search Engine. 
+Our current interaction scheme with GitHub API requires the target repo to be a public repository that is indexed in the Github Search Engine. 
 
 This may cause problems for small repos as the search engine sometimes fail to index them.
 
