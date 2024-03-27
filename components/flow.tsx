@@ -18,6 +18,7 @@ import { getRepositories } from 'app/actions'
 import Fireworks from 'react-canvas-confetti/dist/presets/fireworks'
 import Fuse from 'fuse.js'
 import { useToast } from 'components/ui/use-toast'
+import Markdown from 'markdown-to-jsx'
 
 export default function Flow() {
   const { toast } = useToast()
@@ -92,10 +93,7 @@ export default function Flow() {
         }
         const decoder = new TextDecoder()
         const a = decoder.decode(value)
-        console.log('a)', a)
-        const b = fixStreamText(a)
-        console.log('b)', b)
-        setStreamText(prevState => prevState + b)
+        setStreamText(prevState => prevState + a)
       }
     } catch (error) {
       console.error(error)
@@ -105,21 +103,9 @@ export default function Flow() {
   }
 
   useEffect(() => {
-    // possible error messages:
-    // - Error: Gitfix could not discover any files in the repositoy. Make sure you inputed your repository name
-    // correctly and your repository is indexed in Github search engine.
-    // If your repository is not indexed, please wait a while until Github indexes your repository.
-    // - Error: Forking process failed, aborting!
-    // - Error: Cannot connect to Redis, aborting!
-    // - Error: Gitfix could not create a new branch for changes. This is most likely due to delays in completing the
-    // forking process on Github's end. Please try again in a minute.
-    // - Error: File ${originalRepo.items[index].path} is not updated due to limitations in OpenAI API. Please try
-    // again in a few minutes.`
-
     // possible success messages:
     // - Success: Creating PR request.
     // - All grammar errors in the repository are previously corrected by GitFix.
-
     if (
       streamText.includes('Success:') ||
       streamText.includes('previously corrected')
@@ -129,8 +115,10 @@ export default function Flow() {
   }, [streamText])
 
   useEffect(() => {
+    if (process.env.NODE_ENV !== 'development') return
+
     const formData = new FormData()
-    formData.append('username', 'ademilter')
+    formData.append('username', 'upstash')
     dispatch(formData)
   }, [])
 
@@ -266,33 +254,49 @@ export default function Flow() {
           <StepTitle>Creating PR Request</StepTitle>
           {repo && (
             <StepContent>
-              <Content className="px-5">
-                <pre className="w-full text-sm text-pretty whitespace-pre-wrap">
-                  {streamText.split('\n').map((o, i) =>
-                    ['', ' ', '.'].includes(o) ? null : (
-                      <span
-                        key={i}
-                        className="flex w-full min-h-6 last:font-semibold last:text-emerald-600"
-                      >
-                        {o.replace(/"/g, '')}
-                      </span>
-                    )
-                  )}
+              <Content
+                className={cn(
+                  'px-6',
+                  streamText.includes('Error:') &&
+                    'bg-red-500/5 text-red-800 border-red-500/30',
+                  streamText.includes('Success:') &&
+                    'bg-emerald-500/5 text-emerald-800 border-emerald-500/30'
+                )}
+              >
+                <pre className="w-full font-mono text-pretty whitespace-pre-wrap">
+                  <Markdown
+                    options={{
+                      overrides: {
+                        ul: ({ children }) => (
+                          <ol className="list-disc list-inside ml-4 font-semibold">
+                            {children}
+                          </ol>
+                        )
+                      }
+                    }}
+                  >
+                    {fixStreamText(streamText)}
+                  </Markdown>
+
                   {isStream && (
-                    <span className="flex items-center gap-2 font-semibold text-emerald-600">
+                    <span className="flex items-center gap-2 font-semibold text-emerald-800">
                       <LoaderCircle size={18} className="animate-spin" />
                       Processing...
                     </span>
                   )}
-                  {/*{isFinish && (*/}
-                  {/*  <a*/}
-                  {/*    className="mt-4 flex text-emerald-600"*/}
-                  {/*    href={repo.html_url}*/}
-                  {/*    target="_blank"*/}
-                  {/*  >*/}
-                  {/*    <span className="underline font-semibold">{repo.html_url.replace('https://', '')}</span> has been fixed!*/}
-                  {/*  </a>*/}
-                  {/*)}*/}
+
+                  {isFinish && streamText.includes('Success') && (
+                    <p className="font-semibold mt-4 py-1 px-3 bg-emerald-800 text-emerald-50 rounded">
+                      →{' '}
+                      <a
+                        className="underline"
+                        href={repo.html_url}
+                        target="_blank"
+                      >
+                        {repo.html_url.replace('https://', '')}
+                      </a>
+                    </p>
+                  )}
                 </pre>
               </Content>
             </StepContent>
