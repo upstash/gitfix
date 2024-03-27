@@ -15,7 +15,10 @@ import Confetti from './confetti'
 export default function Flow() {
   const { toast } = useToast()
 
-  const [result, dispatch] = useFormState(getRepositories, undefined)
+  const [result, dispatch] = useFormState(getRepositories, {
+    repos: [],
+    type: ResultCode.EmptyRepos
+  })
   const { streamText, isFinish, setFinish, setRepos, setUser, onReset } =
     store()
 
