@@ -85,11 +85,11 @@ Following provides a matching between config.json content and required environme
 
 ```
 GITFIX_USE_ENV=true => to instruct gitfix to read environment variables instead of config.json. Existence of config.json file is still required to compile typescript.
- "files-per-run"=> FILES_PER_RUN
-    "github-token"=> GITHUB_TOKEN
-    "upstash-redis-url"=> process.env.UPSTASH_REDIS_URL
-    "upstash-redis-token"=> process.env.UPSTASH_REDIS_TOKEN
-    "openai-key": => OPENAI_KEY
+"files-per-run"=> FILES_PER_RUN
+"github-token"=> GITHUB_TOKEN
+"upstash-redis-url"=> process.env.UPSTASH_REDIS_URL
+"upstash-redis-token"=> process.env.UPSTASH_REDIS_TOKEN
+"openai-key": => OPENAI_KEY
 ```
 
 ### Contributing
