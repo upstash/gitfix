@@ -1,0 +1,8 @@
+{
+    "github-repo": "target repository",
+    "files-per-run": 3,
+    "github-token": "github api token",
+    "upstash-redis-url": "upstash redis url",
+    "upstash-redis-token": "upstash redis token(not a password)",
+    "openai-key": "openai api token"
+}

@@ -3,7 +3,8 @@ export const maxDuration = 300;
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic'; // always run dynamically
 
-// import config from '../../../../../../config.json'
+import config from '../../../../../../config.json'
+
 import gitfix from "./gitfix";
 type Params = {
   owner: string,
@@ -25,11 +26,14 @@ export async function GET(request: Request, context: { params: Params }) {
   const encoder = new TextEncoder();
   let owner = context.params.owner;
   let repo = context.params.repo;
-  let config = generate_config_from_environment()
+  let gitfix_config = config;
+  if(process.env.GITFIX_USE_ENV){
+    gitfix_config = generate_config_from_environment()
+  }
   console.log(config)
   const customReadable = new ReadableStream({
     async start(controller) {
-      for await (let chunk of gitfix(owner, repo, true, config)) {
+      for await (let chunk of gitfix(owner, repo, true, gitfix_config)) {
         const chunkData =  encoder.encode(JSON.stringify(chunk));
         controller.enqueue(chunkData);
       }
