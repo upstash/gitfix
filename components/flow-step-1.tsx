@@ -47,13 +47,13 @@ function Form({ user }: { user: StoreState['user'] }) {
         <input hidden name="username" />
         <Button size="sm" variant="outline" disabled={pending}>
           {pending && <LoaderCircle size={20} className="animate-spin mr-2" />}
-          Change Github Account
+          Change Account
         </Button>
       </div>
     </Content>
   ) : (
     <Content>
-      <IconGitHub height={32} className="hidden sm:inline-flex" />
+      <IconGitHub height={32} className="shrink-0 hidden sm:inline-flex" />
       <Input
         name="username"
         className="sm:grow"

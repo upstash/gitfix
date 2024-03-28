@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { cn } from 'lib/utils'
 import Content, { ContentProps } from './content'
+import { Button } from './ui/button'
 
 export interface PRProps extends ContentProps {}
 
@@ -9,7 +10,6 @@ export default function PR({}: PRProps) {
     <Content
       asChild
       className={cn(
-        'pr-16 sm:pr-0',
         'bg-emerald-500/10 text-emerald-800 border-emerald-500/30',
         'dark:bg-emerald-800/10 dark:text-emerald-200 dark:border-emerald-900'
       )}
@@ -31,12 +31,16 @@ export default function PR({}: PRProps) {
           </svg>
         </span>
 
-        <div>
+        <div className="grow">
           <h4 className="font-semibold">
             GitFix: Fixing grammar errors in md and mdx files
           </h4>
           <p className="opacity-70">#561 opened now by GitFix</p>
         </div>
+
+        <Button className="bg-emerald-700 dark:bg-emerald-700" size="sm">
+          Review
+        </Button>
       </a>
     </Content>
   )
