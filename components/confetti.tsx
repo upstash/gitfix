@@ -1,5 +1,3 @@
-'use client'
-
 import * as React from 'react'
 import Fireworks from 'react-canvas-confetti/dist/presets/fireworks'
 import twColors from 'tailwindcss/colors'

@@ -2,7 +2,7 @@ import { create } from 'zustand'
 
 import { Profile, Repository } from 'lib/types'
 
-interface State {
+export interface StoreState {
   repos: Repository[]
   setRepos: (repos: Repository[]) => void
   user: Profile | undefined
@@ -24,7 +24,7 @@ interface State {
   onReset: () => void
 }
 
-const store = create<State>((set, get) => ({
+const store = create<StoreState>((set, get) => ({
   repos: [],
   setRepos: repos => set({ repos }),
   user: undefined,

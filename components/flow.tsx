@@ -19,8 +19,22 @@ export default function Flow() {
     repos: [],
     type: ResultCode.EmptyRepos
   })
-  const { streamText, isFinish, setFinish, setRepos, setUser, onReset } =
-    store()
+  const {
+    user,
+    streamText,
+    isFinish,
+    setFinish,
+    setRepos,
+    setUser,
+    onReset,
+    repo,
+    isStream,
+    query,
+    setQuery,
+    repos,
+    setRepo,
+    fixRepo
+  } = store()
 
   React.useEffect(() => {
     onReset()
@@ -73,11 +87,24 @@ export default function Flow() {
     <>
       <Step className="mt-16 md:mt-20">
         {/* Github profile */}
-        <FlowStep1 dispatch={dispatch} />
+        <FlowStep1 user={user} dispatch={dispatch} />
         {/* Select a repository */}
-        <FlowStep2 />
+        <FlowStep2
+          query={query}
+          repo={repo}
+          setQuery={setQuery}
+          repos={repos}
+          user={user}
+          setRepo={setRepo}
+          fixRepo={fixRepo}
+        />
         {/* Creating PR Request */}
-        <FlowStep3 />
+        <FlowStep3
+          repo={repo}
+          streamText={streamText}
+          isStream={isStream}
+          isFinish={isFinish}
+        />
       </Step>
 
       {isFinish && <Confetti />}

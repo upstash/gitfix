@@ -1,5 +1,3 @@
-'use client'
-
 import * as React from 'react'
 import { StepContent, StepItem, StepNumber, StepTitle } from './step-list'
 import Content from './content'
@@ -8,14 +6,14 @@ import Image from 'next/image'
 import { Button } from './ui/button'
 import IconGitHub from './icon-github'
 import { Input } from './ui/input'
-import store from 'store/index'
+import { StoreState } from '../store'
 import { useFormStatus } from 'react-dom'
 
-export default function FlowStep1({
-  dispatch
-}: {
+export interface FlowStep1Props extends Pick<StoreState, 'user'> {
   dispatch: (payload: FormData) => void
-}) {
+}
+
+export default function FlowStep1({ user, dispatch }: FlowStep1Props) {
   return (
     <StepItem>
       <StepNumber />
@@ -23,7 +21,7 @@ export default function FlowStep1({
       <StepContent>
         <Content>
           <form action={dispatch} className="flex w-full items-center gap-4">
-            <Form />
+            <Form user={user} />
           </form>
         </Content>
       </StepContent>
@@ -31,9 +29,8 @@ export default function FlowStep1({
   )
 }
 
-function Form() {
+function Form({ user }: { user: StoreState['user'] }) {
   const { pending } = useFormStatus()
-  const { user } = store()
 
   return user ? (
     <>
