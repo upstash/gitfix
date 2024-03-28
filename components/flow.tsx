@@ -75,13 +75,13 @@ export default function Flow() {
     }
   }, [streamText])
 
-  // React.useEffect(() => {
-  //   if (process.env.NODE_ENV !== 'development') return
-  //
-  //   const formData = new FormData()
-  //   formData.append('username', 'upstash')
-  //   dispatch(formData)
-  // }, [])
+  React.useEffect(() => {
+    if (process.env.NODE_ENV !== 'development') return
+
+    const formData = new FormData()
+    formData.append('username', 'upstash')
+    dispatch(formData)
+  }, [])
 
   return (
     <>

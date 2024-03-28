@@ -9,6 +9,7 @@ export default function PR({}: PRProps) {
     <Content
       asChild
       className={cn(
+        'pr-16 sm:pr-0',
         'bg-emerald-500/10 text-emerald-800 border-emerald-500/30',
         'dark:bg-emerald-800/10 dark:text-emerald-200 dark:border-emerald-900'
       )}

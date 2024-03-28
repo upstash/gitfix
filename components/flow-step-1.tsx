@@ -19,11 +19,9 @@ export default function FlowStep1({ user, dispatch }: FlowStep1Props) {
       <StepNumber />
       <StepTitle>Select a Github Account</StepTitle>
       <StepContent>
-        <Content>
-          <form action={dispatch} className="flex w-full items-center gap-4">
-            <Form user={user} />
-          </form>
-        </Content>
+        <form action={dispatch}>
+          <Form user={user} />
+        </form>
       </StepContent>
     </StepItem>
   )
@@ -33,39 +31,39 @@ function Form({ user }: { user: StoreState['user'] }) {
   const { pending } = useFormStatus()
 
   return user ? (
-    <>
-      <Image
-        src={user.avatar_url}
-        alt={user.login}
-        width={32}
-        height={32}
-        className="rounded-full size-8"
-      />
-      <span className="font-medium">{user.login}</span>
+    <Content>
+      <div className="flex items-center gap-2">
+        <Image
+          src={user.avatar_url}
+          alt={user.login}
+          width={32}
+          height={32}
+          className="rounded-full size-8"
+        />
+        <span className="font-medium">{user.login}</span>
+      </div>
 
-      <div className="ml-auto flex">
+      <div className="flex flex-col sm:ml-auto">
         <input hidden name="username" />
         <Button size="sm" variant="outline" disabled={pending}>
           {pending && <LoaderCircle size={20} className="animate-spin mr-2" />}
           Change Github Account
         </Button>
       </div>
-    </>
+    </Content>
   ) : (
-    <>
-      <IconGitHub height={32} />
-      <div className="flex items-center grow gap-2">
-        <Input
-          name="username"
-          className="grow"
-          placeholder="username"
-          disabled={pending}
-        />
-        <Button size="sm" disabled={pending}>
-          {pending && <LoaderCircle size={20} className="animate-spin mr-2" />}
-          Get Repositories
-        </Button>
-      </div>
-    </>
+    <Content>
+      <IconGitHub height={32} className="hidden sm:inline-flex" />
+      <Input
+        name="username"
+        className="sm:grow"
+        placeholder="username"
+        disabled={pending}
+      />
+      <Button size="sm" disabled={pending}>
+        {pending && <LoaderCircle size={20} className="animate-spin mr-2" />}
+        Get Repositories
+      </Button>
+    </Content>
   )
 }

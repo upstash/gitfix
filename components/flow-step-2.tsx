@@ -43,16 +43,18 @@ export default function FlowStep2({
         <StepContent>
           {repo ? (
             <Content>
-              <IconGitHub height={28} />
-              <a
-                className="font-medium underline decoration-zinc-500/50"
-                href={repo.html_url}
-                target="_blank"
-              >
-                {repo.html_url.replace('https://', '')}
-              </a>
+              <div className="flex items-center gap-2">
+                <IconGitHub height={32} />
+                <a
+                  className="font-medium underline decoration-zinc-500/50"
+                  href={repo.html_url}
+                  target="_blank"
+                >
+                  {repo.html_url.replace('https://', '')}
+                </a>
+              </div>
               <Button
-                className="ml-auto"
+                className="sm:ml-auto"
                 size="sm"
                 variant="outline"
                 onClick={onResetRepo}
@@ -96,7 +98,10 @@ function DataTable({
     <>
       <Input placeholder="Search..." onChange={e => setQuery(e.target.value)} />
 
-      <Content asChild className="mt-4 h-[260px] p-2 w-full">
+      <Content
+        asChild
+        className="mt-4 h-[200px] sm:h-[260px] p-0 sm:p-2 w-full"
+      >
         <ScrollArea>
           <Table className="text-left">
             <TableBody>
