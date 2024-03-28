@@ -13,14 +13,18 @@ import store from 'store/index'
 import Fuse from 'fuse.js'
 
 export default function FlowStep2() {
-  const { query, repo, onReset, setQuery, repos, user, setRepo, fixRepo } =
-    store()
+  const { query, repo, setQuery, repos, user, setRepo, fixRepo } = store()
 
   const fuse = new Fuse(repos, {
     keys: ['name']
   })
 
   const filterData = query ? fuse.search(query).map(o => o.item) : repos
+
+  const onResetRepo = React.useCallback(() => {
+    setRepo(undefined)
+    setQuery('')
+  }, [repo, query])
 
   return (
     <StepItem>
@@ -30,17 +34,20 @@ export default function FlowStep2() {
         <StepContent>
           {repo ? (
             <Content>
-              <div className="flex items-center gap-2 w-full">
-                <IconGitHub height={28} />
-                <a
-                  className="font-medium underline decoration-zinc-500/50"
-                  href={repo.html_url}
-                  target="_blank"
-                >
-                  {repo.html_url.replace('https://', '')}
-                </a>
-              </div>
-              <Button size="sm" variant="outline" onClick={onReset}>
+              <IconGitHub height={28} />
+              <a
+                className="font-medium underline decoration-zinc-500/50"
+                href={repo.html_url}
+                target="_blank"
+              >
+                {repo.html_url.replace('https://', '')}
+              </a>
+              <Button
+                className="ml-auto"
+                size="sm"
+                variant="outline"
+                onClick={onResetRepo}
+              >
                 Change Repository
               </Button>
             </Content>

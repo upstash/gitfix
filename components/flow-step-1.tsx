@@ -22,7 +22,7 @@ export default function FlowStep1({
       <StepTitle>Select a Github Account</StepTitle>
       <StepContent>
         <Content>
-          <form action={dispatch} className="flex w-full items-center gap-2">
+          <form action={dispatch} className="flex w-full items-center gap-4">
             <Form />
           </form>
         </Content>
@@ -42,7 +42,7 @@ function Form() {
         alt={user.login}
         width={32}
         height={32}
-        className="rounded-full"
+        className="rounded-full size-8"
       />
       <span className="font-medium">{user.login}</span>
 
