@@ -1,7 +1,13 @@
 'use client'
 
 import * as React from 'react'
-import { StepContent, StepItem, StepNumber, StepTitle } from './step-list'
+import {
+  StepContent,
+  StepDesc,
+  StepItem,
+  StepNumber,
+  StepTitle
+} from './step-list'
 import { cn, fixStreamText } from 'lib/utils'
 import Content from './content'
 import { LoaderCircle } from 'lucide-react'
@@ -15,23 +21,27 @@ export default function FlowStep3() {
     <StepItem>
       <StepNumber />
       <StepTitle>Creating PR Request</StepTitle>
+      <StepDesc>
+        This demo processes 3 files at each run. Deploy app yourself to
+        configure this.
+      </StepDesc>
       {repo && (
         <StepContent>
           <Content
             className={cn(
               'px-6',
               streamText.includes('Error:') &&
-                'bg-red-500/5 text-red-800 border-red-500/30 dark:bg-red-500/5 dark:text-red-400 dark:border-red-500/20',
+                'bg-red-500/5 text-red-800 border-red-500/30 dark:bg-red-500/5 dark:text-red-300 dark:border-red-500/20',
               streamText.includes('Success:') &&
-                'bg-emerald-500/5 text-emerald-800 border-emerald-500/30 dark:bg-emerald-500/5 dark:text-emerald-400 dark:border-emerald-500/20'
+                'bg-emerald-500/5 text-emerald-800 border-emerald-500/30 dark:bg-emerald-500/5 dark:text-emerald-300 dark:border-emerald-500/20'
             )}
           >
-            <pre className="w-full font-mono text-pretty whitespace-pre-wrap">
+            <pre className="w-full text-[.94rem] leading-relaxed font-mono text-pretty whitespace-pre-wrap">
               <Markdown
                 options={{
                   overrides: {
                     ul: ({ children }) => (
-                      <ol className="list-disc list-inside ml-4 font-semibold">
+                      <ol className="list-disc line-clamp-3 list-inside ml-4 font-semibold">
                         {children}
                       </ol>
                     )

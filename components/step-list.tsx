@@ -53,6 +53,13 @@ const StepTitle = ({ className, ...props }: StepTitleProps) => {
 }
 StepTitle.displayName = 'StepTitle'
 
+export interface StepDescProps extends React.ComponentPropsWithoutRef<'h3'> {}
+
+const StepDesc = ({ className, ...props }: StepDescProps) => {
+  return <p className={cn('opacity-60', className)} {...props} />
+}
+StepDesc.displayName = 'StepDesc'
+
 export interface StepContentProps
   extends React.ComponentPropsWithoutRef<'div'> {}
 
@@ -61,4 +68,4 @@ const StepContent = ({ className, ...props }: StepContentProps) => {
 }
 StepContent.displayName = 'StepContent'
 
-export { Step, StepItem, StepNumber, StepTitle, StepContent }
+export { Step, StepItem, StepNumber, StepTitle, StepDesc, StepContent }
