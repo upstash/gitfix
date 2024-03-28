@@ -59,7 +59,7 @@ export default function FlowStep2({
                 variant="outline"
                 onClick={onResetRepo}
               >
-                Change Repository
+                Change Repo
               </Button>
             </Content>
           ) : (

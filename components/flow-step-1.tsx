@@ -17,7 +17,9 @@ export default function FlowStep1({ user, dispatch }: FlowStep1Props) {
   return (
     <StepItem>
       <StepNumber />
-      <StepTitle>Select a Github Account</StepTitle>
+      <StepTitle>
+        Choose a GitHub Account
+      </StepTitle>
       <StepContent>
         <form action={dispatch}>
           <Form user={user} />

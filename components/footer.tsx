@@ -3,7 +3,7 @@ import ALink from './link'
 export default function Footer() {
   return (
     <footer
-      className="text-center pt-16 mt-32 space-y-4
+      className="text-center pt-16 mt-24 space-y-2
       text-zinc-700 dark:text-zinc-400"
     >
       <p>
@@ -28,7 +28,7 @@ export default function Footer() {
         </ALink>
       </p>
 
-      <p>
+      <p className="pt-4">
         <a className="inline-flex hover:bg-transparent" href="/">
           <img src="https://vercel.com/button" alt="Deploy with Vercel" />
         </a>
