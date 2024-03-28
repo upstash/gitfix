@@ -12,7 +12,7 @@ async function *gitfix(owner: string, repo:string, demo_mode: boolean, config: a
   if (demo_mode){
     let prev_changed_files = await redis.getMembers(owner)
     if (prev_changed_files.length > 3){
-      yield "Error: Gitfix already corrected 3 files in repositories of this user in demo mode. Please run gitfix in your local for unlimited use. See https://github.com/upstash/gitfix for more.\n\n"
+      yield "Error: Gitfix has already corrected 3 files in repositories of this user in demo mode. Please install gitfix for unlimited use. For installation, see https://github.com/upstash/gitfix for more.\n\n"
       return
     }
   }
@@ -29,13 +29,15 @@ async function *gitfix(owner: string, repo:string, demo_mode: boolean, config: a
   for( let i = 0 ; i < originalRepo.items.length ; ++i ) {
     logs += '- ' + originalRepo.items[i].path + '\n\n';
   }
-  yield logs
+  
   
   if (originalRepo.items.length == 0){
     yield `Error: Gitfix could not discover any files in the repositoy.
     Make sure you inputed your repository name correctly and your repository is indexed in Github search engine.
     If your repository is not indexed, please wait a while until Github indexes your repository.\n\n`
     return  
+  }else{
+    yield `Gitfix discovered ${originalRepo.items.length} files in the repository.\n\n`
   }
   
   yield 'Forking the repository. \n\n'
