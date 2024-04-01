@@ -164,6 +164,7 @@ async function* gitfix(owner: string, repo: string, demo_mode: boolean, config: 
   }
   const targetRepo = originalRepo;
   const prKey = targetRepo.owner + targetRepo.repo + "PR";
+  console.log(prKey)
   type PR = {
     link: string;
     number: number;
