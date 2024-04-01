@@ -185,8 +185,8 @@ async function* gitfix(owner: string, repo: string, demo_mode: boolean, config: 
   console.log(content)
   if(response.ok){
 
-    redis.insert(prKey, ({"link" : content.html_url, "number": content.number}))
     yield `Success: Gitfix created a PR that includes suggested grammar corrections. You can see the created request [here](${content.html_url}).`
+    redis.insert(prKey, ({"link" : content.html_url, "number": content.number}))
   }else{
     yield `Error: Something went wrong during PR creation, please try again in a minute.`
   }
