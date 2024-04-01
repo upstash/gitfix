@@ -162,7 +162,7 @@ async function* gitfix(owner: string, repo: string, demo_mode: boolean, config: 
   if (errored == indexes.length) {
     //yield an error here
   }
-  const targetRepo = forkedRepo;
+  const targetRepo = originalRepo;
   const prKey = targetRepo.owner + targetRepo.repo + "PR";
   type PR = {
     link: string;
