@@ -88,6 +88,7 @@ class GithubAPIWrapper {
     });
 
     const content = await response.json();
+    console.log(content)
     const full_name = content["full_name"];
     const [owner, repo] = full_name.split('/');
 
@@ -167,7 +168,7 @@ class GithubAPIWrapper {
       await new Promise(resolve => setTimeout(resolve, 10000)); // Sleep for 10 seconds
       return await this.getRef(ref, trials + 1);
     }
-    return response.json();
+    return await response.json();
     
   }
 
@@ -178,29 +179,51 @@ class GithubAPIWrapper {
   async createPR(alteredRepo: GithubAPIWrapper) {
     const url = `https://api.github.com/repos/${this.owner}/${this.repo}/pulls`;
     const headers = {
-      "Accept": "application/vnd.github.raw+json",
+      "Accept": "application/vnd.github+json",
       "Authorization": `Bearer ${this.auth}`,
       "X-GitHub-Api-Version": "2022-11-28"
     };
     let bodyContent = "Correcting grammar errors in following files:\n"
-    for(let index in this.updatedItems){
-      bodyContent += `\t${this.items[index].path}\n`;
+    for(let index in alteredRepo.updatedItems){
+      bodyContent += `- ${this.items[index].path}\n\n`;
     }
     bodyContent += "Automated by GitFix";
-    const body = {
+    const bodyy = {
       "title": "Gitfix: fixing grammar errors in md and mdx files.",
       "head": "gitfix",
       "head_repo": `${alteredRepo.owner}/${alteredRepo.repo}`,
       "base": this.getDefaultBranch(),
       "maintainer_can_modify": true,
-      "body": bodyContent
+      "body" : bodyContent.toString()
     };
+    //ERROR: BODY IS UNUSABLE
     const response = await fetch(url, {
       method: 'POST',
-      headers,
-      body: JSON.stringify(body)
+      headers: headers,
+      body: JSON.stringify(bodyy)
     });
+  
+    console.log(response.status)
     return response;
+  }
+  async checkIfMerged(pullNumber: number) {
+    const url = `https://api.github.com/repos/${this.owner}/${this.repo}/pulls/${pullNumber}/merge`;
+    const headers = {
+      "Accept": "application/vnd.github+json",
+      "Authorization": `Bearer ${this.auth}`,
+      "X-GitHub-Api-Version": "2022-11-28"
+    };
+    //ERROR: BODY IS UNUSABLE
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: headers,
+    });
+  
+    console.log(await response.json())
+    if (response.status == 204){
+      return true
+    }
+    return false;
   }
 
 }

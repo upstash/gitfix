@@ -41,6 +41,16 @@ class RedisWrapper {
         const members = await this.redis.smembers(setName);
         return members;
     }
+    async setKey(key: string, value: string) {
+        await this.redis.set(key, value);
+    }
+    async getKey(key: string) {
+        type PR = {
+            link: string;
+            number: number;
+        }
+        return await this.redis.get(key);
+    }
 }
 
 export default RedisWrapper;
