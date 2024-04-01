@@ -179,7 +179,7 @@ async function* gitfix(owner: string, repo: string, demo_mode: boolean, config: 
    }
   }
 
-  yield "Creating PR request.\n";
+  yield "Creating PR request.\n\n";
   let response = await targetRepo.createPR(forkedRepo);
   let content = await response.json()
   console.log(content)
