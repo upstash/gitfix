@@ -9,10 +9,10 @@ export function fixStreamText(value: string) {
   if (!value) return value
 
   return value
-    .replace(/""/g, '\n')
-    .replace(/\\n /g, '\n')
+    .replace(/\\n\\n/g, '\n')
     .replace(/\\n/g, '\n')
-    .replace(/\\t/g, '\n ✓')
+    .replace(/"+/g, '\n')
+    .replace(/​/g, '')
     .trim()
 }
 
