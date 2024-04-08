@@ -26,10 +26,6 @@ async function* gitfix(owner: string, repo: string, demo_mode: boolean, config: 
   await originalRepo.getItems()
 
   let logs = "Discovering items:\n\n"
-  for (let i = 0; i < originalRepo.items.length; ++i) {
-    logs += '- ' + originalRepo.items[i].path + '\n\n';
-  }
-
 
   if (originalRepo.items.length == 0) {
     yield `Error: Gitfix could not discover any files in the repositoy.
