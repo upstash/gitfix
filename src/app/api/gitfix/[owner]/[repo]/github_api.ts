@@ -15,16 +15,10 @@ class GithubAPIWrapper {
   }
 
   async getItems( demoMode: boolean = false): Promise<void> {
-    let initialPageSize = 100;
-    if (demoMode) {
-      //TODO: roll this back to 30
-      initialPageSize = 100;
-    }
-    let pageSize = initialPageSize;
-    let page = 1;
-
-    while (pageSize === initialPageSize) {
-      const url = `https://api.github.com/search/code?q=extension:mdx+extension:md+repo:${this.owner}/${this.repo}&per_page=${initialPageSize}&page=${page}`;
+      if(this.details === undefined){
+        await this.populateDetails();
+      }
+      const url = `https://api.github.com/repos/${this.owner}/${this.repo}/git/trees/${this.getDefaultBranch()}?recursive=0`;
       const headers = {
         "Accept": "application/vnd.github+json",
         "Authorization": `Bearer ${this.auth}`,
@@ -32,19 +26,18 @@ class GithubAPIWrapper {
 
       const response = await fetch(url, { headers });
       const data = await response.json();
-      pageSize = data.items.length;
       console.log(`discovering itemms in ${this.owner + "/" + this.repo}`)
-      for (const item of data.items) {
-        console.log(`\t${item.path}`);
-        this.items.push({ path: item.path, sha: item.sha });
+      for (const item of data.tree) {
+        if(item.type === "blob"){
+          let type = item.path.split('.').pop();
+          if(type == "md" || type === "mdx"){
+            console.log(item.path)
+            this.items.push({ path: item.path, sha: item.sha });
+          }
+        }
       }
 
-      page += 1;
-
-      if (demoMode) {
-        break;
-      }
-    }
+    console.log(`discovered ${this.items.length} items`)
   }
 
   async getItemContent(index: number): Promise<string> {
@@ -117,9 +110,11 @@ class GithubAPIWrapper {
         branch: "gitfix"
       })
     });
-    if(response.status == 201){
+    if(response.status == 200){
       this.updatedItems.push(index)
     }
+    let body = await response.json()
+    console.log(body);
     return response;
 
   }
