@@ -11,6 +11,7 @@ import FlowStep2 from './flow-step-2'
 import FlowStep3 from './flow-step-3'
 import { ResultCode } from '../lib/utils'
 import Confetti from './confetti'
+import { useSearchParams } from 'next/navigation'
 
 export default function Flow() {
   const { toast } = useToast()
@@ -33,12 +34,42 @@ export default function Flow() {
     setQuery,
     repos,
     setRepo,
-    fixRepo
+    fixRepo,
   } = store()
 
+  const searchParams = useSearchParams()
+  const code = searchParams.get('code')
+  console.log(code);
+  if(code != null ){
+    
+    const params = {
+      "code" : code,
+      "client_id": "Iv1.203244c6dd3aa706",
+      "client_secret": "e5babb69693b253dbcda9a953a9b40f01f29aa7e" 
+    };
+    const query = new URLSearchParams(params).toString();
+    const res = fetch('https://github.com/login/oauth/access_token/?' + query  ,{
+      method: 'POST',
+      headers: {
+        'accept': 'application/json'
+      }
+    }).then( async function (res) {
+      const authResponse = await res.json()
+      // auth response is in format: 
+      // {
+      //   access_token: 'ghu_wJ9zTgSkTQDT5h0MqXB0AfNVVqlcNS4PSdL6',
+      //   expires_in: 28800,
+      //   refresh_token: 'ghr_3VNqg3nVVGGAGMDiizLlqO90Xt5R3TjsZoUBxOFyDEEv1rtpnuMXcL5ZSfToFfHliHR5kc0i42nT',
+      //   refresh_token_expires_in: 15811200,
+      //   token_type: 'bearer',
+      //   scope: ''
+      // }
+      // where access token is a github api token
+      console.log(authResponse)
+    }) 
+  }
   React.useEffect(() => {
     onReset()
-
     if (!result) return
 
     if (result.type === ResultCode.EnvironmentError) {

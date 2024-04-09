@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { StepContent, StepItem, StepNumber, StepTitle } from './step-list'
 import Content from './content'
-import { LoaderCircle } from 'lucide-react'
+import { Link, LoaderCircle } from 'lucide-react'
 import Image from 'next/image'
 import { Button } from './ui/button'
 import IconGitHub from './icon-github'
@@ -14,11 +14,13 @@ export interface FlowStep1Props extends Pick<StoreState, 'user'> {
 }
 
 export default function FlowStep1({ user, dispatch }: FlowStep1Props) {
+  //TODO: make this a pop up
+  //TODO: maybe get client id from env
   return (
     <StepItem>
       <StepNumber />
       <StepTitle>
-        Choose a GitHub Account
+      <a href="https://github.com/login/oauth/authorize?client_id=Iv1.203244c6dd3aa706" target="_blank"> Login with Github.</a>.
       </StepTitle>
       <StepContent>
         <form action={dispatch}>
