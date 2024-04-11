@@ -11,6 +11,9 @@ export default async function(config: any){
         }
     }
     )
+    if(!userRequest.ok){
+        throw Error("Broken github token")
+    }
     const userData = await userRequest.json()
     const repoRequest = await fetch('https://api.github.com/user/repos', {
         headers: {

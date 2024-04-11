@@ -11,8 +11,10 @@ import generateUserData from '@/app/modules/get_user_data';
 export async function GET(request: Request) {
     
     let gitfix_config
+    let userData
     try {
         gitfix_config = await getConfig()
+        userData = await generateUserData(gitfix_config)
     } catch (e) {
         return NextResponse.json({ message: (e as Error).message }, {
             status: 401, headers: {
@@ -25,7 +27,6 @@ export async function GET(request: Request) {
             }
         })
     }
-    const userData = await generateUserData(gitfix_config)
 
 
     return NextResponse.json({ user: userData.user , repos: userData.repos }, {

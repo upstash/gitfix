@@ -10,8 +10,10 @@ import generateUserData from '@/app/modules/get_user_data';
 export async function GET(request: Request) {
     const headersList = headers()
     const code = headersList.get('code')
+    let userData;
     await createSession(code as string)
     let gitfix_config;
+    userData = await generateUserData(gitfix_config)
     try {
         gitfix_config = await getConfig()
     } catch (e) {
@@ -27,7 +29,6 @@ export async function GET(request: Request) {
             }
         })
     }
-    const userData = await generateUserData(gitfix_config)
 
 
     return NextResponse.json({ user: userData.user, repos: userData.repos }, {
