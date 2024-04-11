@@ -3,7 +3,7 @@ import { get, set, getSessionId } from './session_store'
 function getCurrentTime() {
     return new Date().getTime() / 1000
 }
-export function generate_config_from_environment(): any {
+function generate_config_from_environment(): any {
     let obj: any = {
         "files-per-run": process.env.FILES_PER_RUN,
         "access_token": process.env.GITHUB_TOKEN,
@@ -78,7 +78,7 @@ async function refreshToken() {
     })
     set('token_created', (Math.floor(getCurrentTime()).toString()))
 }
-export async function getConfig() {
+export default async function getConfig() {
 
     let gitfixConfig = generate_config_from_environment();
 
