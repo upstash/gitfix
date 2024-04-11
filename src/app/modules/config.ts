@@ -1,4 +1,3 @@
-import config from '../../../config.json'
 import { get, set, getSessionId } from './session_store'
 
 function getCurrentTime() {
@@ -71,10 +70,7 @@ async function refreshToken() {
 }
 export default async function getConfig() {
 
-    let gitfixConfig = config
-    if (process.env.GITFIX_USE_ENV) {
-        gitfixConfig = generate_config_from_environment()
-    }
+    let gitfixConfig = generate_config_from_environment();
 
     if ((process.env.AUTH_WITH_GITHUB_APP)) {
         if (!(await getSessionId())) {
