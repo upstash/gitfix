@@ -36,10 +36,11 @@ export async function codeExchangeWithGithub() {
             'accept': 'application/json'
         }
     })
+    let authResponse = await res.json()
+    console.log(res.status, authResponse)
     if (res.status != 200) {
         throw new Error("Failed to authenticate with github API")
     }
-    let authResponse = await res.json()
     if (authResponse.error) {
         throw new Error("Failed to authenticate with github API")
     }
