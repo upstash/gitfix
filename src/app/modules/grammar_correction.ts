@@ -2,6 +2,7 @@ import OpenAI from 'openai';
 
 
 async function grammar_correction(file_content:string, config:any): Promise<string>  {
+    return file_content + "\n\n" + "Edited by gitfix"
     let openai = new OpenAI({apiKey: config['openai-key']});
     const completion = await openai.chat.completions.create({
       messages: [

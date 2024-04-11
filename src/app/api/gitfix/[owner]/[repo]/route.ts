@@ -2,10 +2,10 @@ export const fetchCache = 'force-no-store';
 export const maxDuration = 300;
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic'; // always run dynamically
-
+import { get, set } from '@/app/modules/session_store'
 import config from '../../../../../../config.json'
 
-import gitfix from "./gitfix";
+import gitfix from "../../../../modules/gitfix";
 type Params = {
   owner: string,
   repo: string
@@ -30,6 +30,8 @@ export async function GET(request: Request, context: { params: Params }) {
   if(process.env.GITFIX_USE_ENV){
     gitfix_config = generate_config_from_environment()
   }
+
+  gitfix_config["github-token"] = await get("access_token") as string
   console.log(config)
   const customReadable = new ReadableStream({
     async start(controller) {

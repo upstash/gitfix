@@ -1,3 +1,5 @@
+import { get, set } from './session_store'
+
 class GithubAPIWrapper {
   owner: string;
   repo: string;

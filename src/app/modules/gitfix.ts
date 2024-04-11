@@ -35,7 +35,6 @@ async function* gitfix(owner: string, repo: string, demo_mode: boolean, config: 
   } else {
     yield `Gitfix discovered ${originalRepo.items.length} files in the repository.\n\n`
   }
-
   yield 'Forking the repository. \n\n'
   let forkedRepo: GithubAPIWrapper;
   try {
@@ -158,8 +157,11 @@ async function* gitfix(owner: string, repo: string, demo_mode: boolean, config: 
   if (errored == indexes.length) {
     //yield an error here
   }
-  const targetRepo = originalRepo;
-  const prKey = targetRepo.owner + targetRepo.repo + "PR";
+  let targetRepo = originalRepo;
+  // if(targetRepo.owner != forkedRepo.owner){
+  //   targetRepo = forkedRepo
+  // }
+  const prKey = forkedRepo.owner+ forkedRepo.repo+ "_to_" +targetRepo.owner + targetRepo.repo + "PR";
   console.log(prKey)
   type PR = {
     link: string;
@@ -185,10 +187,17 @@ async function* gitfix(owner: string, repo: string, demo_mode: boolean, config: 
     yield `Success: Gitfix created a PR that includes suggested grammar corrections. You can see the created request [here](${content.html_url}).`
     redis.insert(prKey, ({"link" : content.html_url, "number": content.number}))
   }else{
-    yield `Error: Something went wrong during PR creation, please try again in a minute.`
+    let response = await forkedRepo.createPR(forkedRepo);
+    let content = await response.json()
+    console.log(content)
+    if(response.ok){
+      yield `Success: Gitfix created a PR that includes suggested grammar corrections. However, we could not create the PR directly into the repository you selected. Instead, we created a PR inside the fork. You can see the created request [here](${content.html_url}) and re-direct it to the original repository.`
+      redis.insert(prKey, ({"link" : content.html_url, "number": content.number}))
+    }else{
+      yield `Error: Something went wrong during PR creation, please try again in a minute. You can still find the changes in the gitfix branch on github.com/${forkedRepo.owner}/${forkedRepo.repo}.`
   }
 
 
-}
+}}
 
 export default gitfix
