@@ -16,12 +16,15 @@ function generate_config_from_environment(): any {
 
 async function codeExchangeWithGithub() {
     let code = await getSessionId() as string
+    console.log(`generating access token for ${code}`)
     const params = {
         "code": code,
-        "client_id": "Iv1.203244c6dd3aa706",
-        "client_secret": "e5babb69693b253dbcda9a953a9b40f01f29aa7e"
+        "client_id": process.env.GITHUB_APP_CLIENT_ID as string,
+        "client_secret": process.env.GITHUB_APP_CLIENT_TOKEN as string
     };
+    console.log(params)
     const query = new URLSearchParams(params).toString();
+    console.log(query)
     const res = await fetch('https://github.com/login/oauth/access_token/?' + query, {
         method: 'POST',
         headers: {
@@ -44,13 +47,15 @@ async function codeExchangeWithGithub() {
 }
 
 async function refreshToken() {
+    console.log(`refreshing token for ${await getSessionId()}`)
     const params = {
         "refresh_token": await get('refresh_token') as string,
-        "client_id": "Iv1.203244c6dd3aa706",
-        "client_secret": "e5babb69693b253dbcda9a953a9b40f01f29aa7e",
+        "client_id": process.env.GITHUB_APP_CLIENT_ID as string,
+        "client_secret": process.env.GITHUB_APP_CLIENT_TOKEN as string,
         "grant_type": "refresh_token"
     };
     const query = new URLSearchParams(params).toString();
+    console.log(query)
     const res = await fetch('https://github.com/login/oauth/access_token/?' + query, {
         method: 'POST',
         headers: {
