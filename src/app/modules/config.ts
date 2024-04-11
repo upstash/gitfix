@@ -25,7 +25,7 @@ export async function codeExchangeWithGithub() {
     const params = {
         "code": code,
         "client_id": process.env.GITHUB_APP_CLIENT_ID as string,
-        "client_secret": process.env.GITHUB_APP_CLIENT_TOKEN as string
+        "client_secret": process.env.GITHUB_APP_CLIENT_SECRET as string
     };
     console.log(params)
     const query = new URLSearchParams(params).toString();
@@ -56,7 +56,7 @@ async function refreshToken() {
     const params = {
         "refresh_token": await get('refresh_token') as string,
         "client_id": process.env.GITHUB_APP_CLIENT_ID as string,
-        "client_secret": process.env.GITHUB_APP_CLIENT_TOKEN as string,
+        "client_secret": process.env.GITHUB_APP_CLIENT_SECRET as string,
         "grant_type": "refresh_token"
     };
     const query = new URLSearchParams(params).toString();
