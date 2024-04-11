@@ -2,37 +2,40 @@ export const fetchCache = 'force-no-store';
 export const maxDuration = 300;
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic'; // always run dynamically
-import { get, set } from '@/app/modules/session_store'
-import config from '../../../../../../config.json'
+import { deleteSession, get, set } from '@/app/modules/session_store'
+import getConfig from '@/app/modules/config';
 
 import gitfix from "../../../../modules/gitfix";
+import { NextResponse } from 'next/server';
 type Params = {
   owner: string,
   repo: string
 }
 
-function generate_config_from_environment(): any{
-  let obj:any = {
-    "files-per-run": process.env.FILES_PER_RUN,
-    "github-token": process.env.GITHUB_TOKEN,
-    "upstash-redis-url": process.env.UPSTASH_REDIS_URL,
-    "upstash-redis-token": process.env.UPSTASH_REDIS_TOKEN,
-    "openai-key": process.env.OPENAI_KEY,
-  }
-  return <JSON>obj 
-}
+
 export async function GET(request: Request, context: { params: Params }) {
   // This encoder will stream your text
   const encoder = new TextEncoder();
   let owner = context.params.owner;
   let repo = context.params.repo;
-  let gitfix_config = config;
-  if(process.env.GITFIX_USE_ENV){
-    gitfix_config = generate_config_from_environment()
+  let gitfix_config;
+  try{
+   gitfix_config = await getConfig()
+  }catch(e){
+    deleteSession()
+    return NextResponse.json({ message: (e as Error).message }, {
+      status: 403, headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache',
+          'Access-Control-Allow-Credentials': 'true',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
+          'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+      }
+  })
   }
-
-  gitfix_config["github-token"] = await get("access_token") as string
-  console.log(config)
+  
+  console.log(gitfix_config)
   const customReadable = new ReadableStream({
     async start(controller) {
       for await (let chunk of gitfix(owner, repo, false, gitfix_config)) {

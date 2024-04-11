@@ -1,7 +1,7 @@
 import { get, set } from './session_store'
 
-export default async function(){
-    const token = await get("access_token")
+export default async function(config: any){
+    const token = config['access_token']
 
     const userRequest = await fetch('https://api.github.com/user', {
         headers: {

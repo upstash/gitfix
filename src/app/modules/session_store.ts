@@ -10,6 +10,12 @@ export function getSessionId(): SessionId | undefined {
     return cookieStore.get("session-id")?.value;
 }
 
+export function deleteSession(){
+    const cookieStore = cookies();
+    let id = getSessionId();
+    cookieStore.delete('session-id')
+}
+
 function setSessionId(sessionId: SessionId): void {
     const cookieStore = cookies();
     cookieStore.set("session-id", sessionId);
@@ -32,24 +38,6 @@ export async function createSession(sessionId: SessionId) {
     if (!sessionIdValue) {
         
         setSessionId(sessionId);
-        //TODO use env
-        const params = {
-            "code" : sessionId,
-            "client_id": "Iv1.203244c6dd3aa706",
-            "client_secret": "e5babb69693b253dbcda9a953a9b40f01f29aa7e" 
-        };
-        const query = new URLSearchParams(params).toString();
-        const res = await fetch('https://github.com/login/oauth/access_token/?' + query  ,{
-            method: 'POST',
-            headers: {
-                'accept': 'application/json'
-            }
-        })
-        let authResponse = await res.json()
-        //status code 200 on success
-        console.log(authResponse)
-        console.log(res.status)
-        set("access_token", authResponse["access_token"])
 
         return sessionId;
     }

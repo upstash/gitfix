@@ -22,7 +22,7 @@ async function* gitfix(owner: string, repo: string, demo_mode: boolean, config: 
 
   yield `Processing the repository ${path}\n\n`;
 
-  let originalRepo = new GithubAPIWrapper(owner, repo, config['github-token'])
+  let originalRepo = new GithubAPIWrapper(owner, repo, config['access_token'])
   await originalRepo.getItems()
 
   let logs = "Discovering items:\n\n"
@@ -177,7 +177,6 @@ async function* gitfix(owner: string, repo: string, demo_mode: boolean, config: 
       return
    }
   }
-
   yield "Creating PR request.\n\n";
   let response = await targetRepo.createPR(forkedRepo);
   let content = await response.json()
