@@ -3,18 +3,23 @@ import { get, set, getSessionId } from './session_store'
 function getCurrentTime() {
     return new Date().getTime() / 1000
 }
-function generate_config_from_environment(): any {
+export function generate_config_from_environment(): any {
     let obj: any = {
         "files-per-run": process.env.FILES_PER_RUN,
         "access_token": process.env.GITHUB_TOKEN,
         "upstash-redis-url": process.env.UPSTASH_REDIS_URL,
         "upstash-redis-token": process.env.UPSTASH_REDIS_TOKEN,
         "openai-key": process.env.OPENAI_KEY,
+        "kv-url" : process.env.KV_REST_API_URL,
+        "kv-token" : process.env.KV_REST_API_TOKEN,
+        "client-id": process.env.GITHUB_APP_CLIENT_ID, 
+        "github-auth": process.env.AUTH_WITH_GITHUB_APP
     }
+    console.log(obj)
     return <JSON>obj
 }
 
-async function codeExchangeWithGithub() {
+export async function codeExchangeWithGithub() {
     let code = await getSessionId() as string
     console.log(`generating access token for ${code}`)
     const params = {
@@ -73,7 +78,7 @@ async function refreshToken() {
     })
     set('token_created', (Math.floor(getCurrentTime()).toString()))
 }
-export default async function getConfig() {
+export async function getConfig() {
 
     let gitfixConfig = generate_config_from_environment();
 
