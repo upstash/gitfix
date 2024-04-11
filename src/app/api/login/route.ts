@@ -13,9 +13,9 @@ export async function GET(request: Request) {
     let userData;
     await createSession(code as string)
     let gitfix_config;
-    userData = await generateUserData(gitfix_config)
     try {
         gitfix_config = await getConfig()
+        userData = await generateUserData(gitfix_config)
     } catch (e) {
         deleteSession()
         return NextResponse.json({ message: (e as Error).message }, {
