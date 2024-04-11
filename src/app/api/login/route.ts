@@ -17,7 +17,7 @@ export async function GET(request: Request) {
     } catch (e) {
         deleteSession()
         return NextResponse.json({ message: (e as Error).message }, {
-            status: 403, headers: {
+            status: 401, headers: {
                 'Content-Type': 'application/json',
                 'Cache-Control': 'no-cache',
                 'Access-Control-Allow-Credentials': 'true',
