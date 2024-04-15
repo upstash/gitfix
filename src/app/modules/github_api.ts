@@ -27,7 +27,11 @@ class GithubAPIWrapper {
       };
 
       const response = await fetch(url, { headers });
+      if(!response.ok){
+        throw new Error("get itemsrequest returned not ok")
+      }
       const data = await response.json();
+      console.log(data)
       console.log(`discovering itemms in ${this.owner + "/" + this.repo}`)
       for (const item of data.tree) {
         if(item.type === "blob"){
@@ -61,6 +65,9 @@ class GithubAPIWrapper {
     };
 
     const response = await fetch(url, { headers });
+    if(!response.ok){
+        throw new Error("could not fetch details")
+      }
     this.details = await response.json();
   }
 

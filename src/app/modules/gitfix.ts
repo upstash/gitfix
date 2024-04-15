@@ -22,10 +22,15 @@ async function* gitfix(owner: string, repo: string, demo_mode: boolean, config: 
 
   yield `Processing the repository ${path}\n\n`;
 
-  let originalRepo = new GithubAPIWrapper(owner, repo, config['access_token'])
-  await originalRepo.getItems()
-
-  let logs = "Discovering items:\n\n"
+  let originalRepo: GithubAPIWrapper
+  try{
+    originalRepo = new GithubAPIWrapper(owner, repo, config['access_token'])
+    await originalRepo.getItems()
+  }catch(e){
+    yield "Error: Could not read the repository metadata, aborting!\n\n"
+    console.log(e)
+    return
+  }
 
   if (originalRepo.items.length == 0) {
     yield `Error: Gitfix could not discover any files in the repositoy.
@@ -108,7 +113,6 @@ async function* gitfix(owner: string, repo: string, demo_mode: boolean, config: 
     yield "Error: Gitfix could not find an unupdated file that is sufficiently long(more than 100 chars). Aborting.\n"
     return
   }
-  console.log(logs)
   const indexes = Array.from(fileIndexes);
   yield "Selected files:\n\n"
   for (let i = 0; i < indexes.length; i++) {
