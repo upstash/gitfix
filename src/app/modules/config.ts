@@ -13,7 +13,8 @@ function generate_config_from_environment(): any {
         "kv-url" : process.env.KV_REST_API_URL,
         "kv-token" : process.env.KV_REST_API_TOKEN,
         "client-id": process.env.GITHUB_APP_CLIENT_ID, 
-        "github-auth": process.env.AUTH_WITH_GITHUB_APP
+        "github-auth": process.env.AUTH_WITH_GITHUB_APP,
+        "app-slug": "upstash-gitfix"
     }
     console.log(obj)
     return <JSON>obj
