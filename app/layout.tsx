@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   icons: {
     icon: '/favicon.ico',
     shortcut: '/favicon-16x16.png',
-    apple: '/apple-touch-icon.png'
-  }
+    apple: '/apple-touch-icon.png',
+  },
 }
 
 interface RootLayoutProps {
@@ -24,7 +24,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <body
         className={cn(
-          'antialiased bg-white dark:bg-zinc-950 text-zinc-950 dark:text-zinc-200'
+          'bg-white text-zinc-950 antialiased dark:bg-zinc-950 dark:text-zinc-200',
         )}
       >
         {children}
