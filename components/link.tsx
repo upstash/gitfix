@@ -10,7 +10,7 @@ export default function ALink({ className, ...props }: ALinkProps) {
         'underline decoration-zinc-300 dark:decoration-zinc-700',
         'hover:decoration-zinc-700 dark:hover:decoration-zinc-400',
         'hover:text-zinc-900 dark:hover:text-zinc-50',
-        className
+        className,
       )}
       {...props}
     />

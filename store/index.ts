@@ -3,10 +3,12 @@ import { create } from 'zustand'
 import { Profile, Repository } from 'lib/types'
 
 export interface StoreState {
-  repos: Repository[]
-  setRepos: (repos: Repository[]) => void
+  loadingUser: boolean
+  setLoadingUser: (state: boolean) => void
   user: Profile | undefined
   setUser: (user: Profile | undefined) => void
+  repos: Repository[]
+  setRepos: (repos: Repository[]) => void
   //
   query: string
   setQuery: (query: string) => void
@@ -25,22 +27,24 @@ export interface StoreState {
 }
 
 const store = create<StoreState>((set, get) => ({
+  loadingUser: false,
+  setLoadingUser: (state) => set({ loadingUser: state }),
   repos: [],
-  setRepos: repos => set({ repos }),
+  setRepos: (repos) => set({ repos }),
   user: undefined,
-  setUser: user => set({ user }),
+  setUser: (user) => set({ user }),
   //
   query: '',
-  setQuery: query => set({ query }),
+  setQuery: (query) => set({ query }),
   repo: undefined,
-  setRepo: repo => set({ repo }),
+  setRepo: (repo) => set({ repo }),
   //
   streamText: '',
-  setStreamText: text => set({ streamText: text }),
+  setStreamText: (text) => set({ streamText: text }),
   isStream: false,
-  setStream: state => set({ isStream: state }),
+  setStream: (state) => set({ isStream: state }),
   isFinish: false,
-  setFinish: state => set({ isFinish: state }),
+  setFinish: (state) => set({ isFinish: state }),
   onReset: () => {
     set({
       repos: [],
@@ -49,7 +53,7 @@ const store = create<StoreState>((set, get) => ({
       repo: undefined,
       streamText: '',
       isStream: false,
-      isFinish: false
+      isFinish: false,
     })
   },
   fixRepo: async (username: string, repo: string) => {
@@ -61,11 +65,11 @@ const store = create<StoreState>((set, get) => ({
       set({
         streamText: '',
         isStream: true,
-        isFinish: false
+        isFinish: false,
       })
 
       const response = await fetch(
-        `https://gitfix-next-backend.vercel.app/api/gitfix/${username}/${repo}`
+        `https://gitfix-next-backend.vercel.app/api/gitfix/${username}/${repo}`,
       )
 
       if (!response.body) {
@@ -82,14 +86,14 @@ const store = create<StoreState>((set, get) => ({
         }
         const decoder = new TextDecoder()
         const a = decoder.decode(value)
-        set(state => ({ streamText: state.streamText + a }))
+        set((state) => ({ streamText: state.streamText + a }))
       }
     } catch (error) {
       console.error(error)
     } finally {
       set({ isStream: false })
     }
-  }
+  },
 }))
 
 export default store

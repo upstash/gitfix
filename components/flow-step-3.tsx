@@ -4,21 +4,17 @@ import {
   StepDesc,
   StepItem,
   StepNumber,
-  StepTitle
+  StepTitle,
 } from './step-list'
-import { StoreState } from '../store'
+import store from 'store'
 import PR from './pr'
 import Stream from './stream'
 
-export interface FlowStep3Props
-  extends Pick<StoreState, 'repo' | 'streamText' | 'isStream' | 'isFinish'> {}
+export interface FlowStep3Props {}
 
-export default function FlowStep3({
-  repo,
-  streamText,
-  isStream,
-  isFinish
-}: FlowStep3Props) {
+export default function FlowStep3({}: FlowStep3Props) {
+  const { repo, isFinish, streamText, isStream } = store()
+
   return (
     <StepItem>
       <StepNumber />

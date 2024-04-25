@@ -6,29 +6,13 @@ import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { ScrollArea } from './ui/scroll-area'
 import { Table, TableBody, TableCell, TableRow } from './ui/table'
-import { StoreState } from '../store'
+import store from 'store'
 import Fuse from 'fuse.js'
 
-export interface FlowStep2Props
-  extends Pick<
-    StoreState,
-    'query' | 'repo' | 'setQuery' | 'repos' | 'user' | 'fixRepo' | 'setRepo'
-  > {}
+export interface FlowStep2Props {}
 
-export default function FlowStep2({
-  query,
-  repo,
-  setQuery,
-  repos,
-  user,
-  setRepo,
-  fixRepo
-}: FlowStep2Props) {
-  const fuse = new Fuse(repos, {
-    keys: ['name']
-  })
-
-  const filterData = query ? fuse.search(query).map(o => o.item) : repos
+export default function FlowStep2({}: FlowStep2Props) {
+  const { repos, setRepo, setQuery, repo, query } = store()
 
   const onResetRepo = React.useCallback(() => {
     setRepo(undefined)
@@ -63,14 +47,7 @@ export default function FlowStep2({
               </Button>
             </Content>
           ) : (
-            <DataTable
-              query={query}
-              setQuery={setQuery}
-              repos={repos}
-              user={user}
-              setRepo={setRepo}
-              fixRepo={fixRepo}
-            />
+            <DataTable />
           )}
         </StepContent>
       )}
@@ -78,39 +55,37 @@ export default function FlowStep2({
   )
 }
 
-export interface DataTableProps extends Omit<FlowStep2Props, 'repo'> {}
+export interface DataTableProps {}
 
-function DataTable({
-  query,
-  setQuery,
-  repos,
-  user,
-  setRepo,
-  fixRepo
-}: DataTableProps) {
+function DataTable({}: DataTableProps) {
+  const { repos, setRepo, setQuery, query, user, fixRepo } = store()
+
   const fuse = new Fuse(repos, {
-    keys: ['name']
+    keys: ['name'],
   })
 
-  const filterData = query ? fuse.search(query).map(o => o.item) : repos
+  const filterData = query ? fuse.search(query).map((o) => o.item) : repos
 
   return (
     <>
-      <Input placeholder="Search..." onChange={e => setQuery(e.target.value)} />
+      <Input
+        placeholder="Search..."
+        onChange={(e) => setQuery(e.target.value)}
+      />
 
       <Content
         asChild
-        className="mt-4 h-[200px] sm:h-[260px] p-0 sm:p-2 w-full"
+        className="mt-4 h-[200px] w-full p-0 sm:h-[260px] sm:p-2"
       >
         <ScrollArea>
           <Table className="text-left">
             <TableBody>
-              {filterData.map(repo => (
+              {filterData.map((repo) => (
                 <TableRow key={repo.id}>
-                  <TableCell className="font-medium py-2">
+                  <TableCell className="py-2 font-medium">
                     {repo.name}
                   </TableCell>
-                  <TableCell className="text-right py-2">
+                  <TableCell className="py-2 text-right">
                     <Button
                       size="sm"
                       className=""

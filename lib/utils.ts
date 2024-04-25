@@ -15,11 +15,3 @@ export function fixStreamText(value: string) {
     .replace(/​/g, '')
     .trim()
 }
-
-export enum ResultCode {
-  InvalidUsername = 'INVALID_USERNAME',
-  EmptyRepos = 'EMPTY_REPOS',
-  Success = 'SUCCESS',
-  Error = 'ERROR',
-  EnvironmentError = 'ENVIRONMENT_ERROR'
-}

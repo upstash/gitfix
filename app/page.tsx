@@ -6,7 +6,7 @@ import { Toaster } from 'components/ui/toaster'
 
 export default async function Home() {
   return (
-    <main className="max-w-screen-md mx-auto px-8 pt-10 pb-32 sm:pt-16">
+    <main className="mx-auto max-w-screen-md px-8 pb-32 pt-10 sm:pt-16">
       <Header />
       <Flow />
       <Footer />

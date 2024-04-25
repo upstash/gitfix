@@ -16,11 +16,11 @@ export default function Content({
   return (
     <Comp
       className={cn(
-        'flex flex-col sm:flex-row sm:items-center gap-4 p-4 sm:p-5',
+        'flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:p-5',
         'bg-zinc-50 dark:bg-zinc-900/60',
         'border border-zinc-200 dark:border-zinc-800/80',
         'rounded-xl shadow-sm',
-        className
+        className,
       )}
       {...props}
     />

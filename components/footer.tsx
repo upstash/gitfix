@@ -3,7 +3,7 @@ import ALink from './link'
 export default function Footer() {
   return (
     <footer
-      className="text-center pt-16 mt-24 space-y-2
+      className="mt-24 space-y-2 pt-16 text-center
       text-zinc-700 dark:text-zinc-400"
     >
       <p>
