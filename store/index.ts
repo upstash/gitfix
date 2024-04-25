@@ -56,21 +56,14 @@ const store = create<StoreState>((set, get) => ({
       isFinish: false,
     })
   },
-  fixRepo: async (username: string, repo: string) => {
-    if (!username || !repo) {
-      return alert('Please enter a valid username and repo')
-    }
-
+  fixRepo: async (owner: string, repo: string) => {
     try {
       set({
         streamText: '',
         isStream: true,
-        isFinish: false,
       })
 
-      const response = await fetch(
-        `https://gitfix-next-backend.vercel.app/api/gitfix/${username}/${repo}`,
-      )
+      const response = await fetch(`/api/gitfix?owner=${owner}&repo=${repo}`)
 
       if (!response.body) {
         return alert('No response from server')

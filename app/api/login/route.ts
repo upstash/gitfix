@@ -4,20 +4,24 @@ export const dynamic = 'force-dynamic' // always run dynamically
 import getConfig from 'modules/config'
 import { headers } from 'next/headers'
 import { createSession, deleteSession } from 'modules/session_store'
-import { NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import generateUserData from 'modules/get_user_data'
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const headersList = headers()
   const code = headersList.get('code')
+
   let userData
-  await createSession(code as string)
   let gitfix_config
+
+  await createSession(code as string)
+
   try {
     gitfix_config = await getConfig()
     userData = await generateUserData(gitfix_config)
   } catch (e) {
     deleteSession()
+
     return NextResponse.json(
       { message: (e as Error).message },
       {
