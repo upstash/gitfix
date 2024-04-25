@@ -13,28 +13,24 @@ import ALink from './link'
 export interface FlowStep1Props {}
 
 export default function FlowStep1({}: FlowStep1Props) {
-  const { setLoadingUser, setUser, setRepos } = store()
-
   const searchParams = useSearchParams()
 
-  function checkCode() {
-    let code = searchParams.get('code')
+  const { setLoadingUser, setUser, setRepos } = store()
 
-    if (!code) return false
+  function getCode(): null | string {
+    const code = searchParams.get('code')
 
-    localStorage.setItem('code', code)
-    window.location.href = '/'
-    return true
+    if (code) {
+      localStorage.setItem('code', code)
+      return code
+    }
+
+    return localStorage.getItem('code')
   }
 
   async function init() {
-    if (checkCode()) return
-
-    let code = localStorage.getItem('code')
-
-    if (!code) {
-      return
-    }
+    const code = getCode()
+    if (!code) return
 
     try {
       setLoadingUser(true)

@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { Suspense } from 'react'
 import { useToast } from './ui/use-toast'
 import store from 'store/index'
 import { Step } from './step-list'
@@ -29,12 +30,14 @@ export default function Flow() {
   return (
     <>
       <Step className="mt-16 md:mt-20">
-        {/* Github profile */}
-        <FlowStep1 />
-        {/* Select a repository */}
-        <FlowStep2 />
-        {/* Creating PR Request */}
-        <FlowStep3 />
+        <Suspense>
+          {/* Github profile */}
+          <FlowStep1 />
+          {/* Select a repository */}
+          <FlowStep2 />
+          {/* Creating PR Request */}
+          <FlowStep3 />
+        </Suspense>
       </Step>
 
       {isFinish && <Confetti />}
