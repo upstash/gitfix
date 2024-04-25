@@ -14,8 +14,13 @@ export default function Stream({ streamText, isStream }: PRProps) {
   return (
     <Content className={cn('px-6')}>
       <pre
-        className="w-full whitespace-pre-wrap text-pretty
-      font-mono text-[.94rem] leading-relaxed"
+        className={cn(
+          'w-full whitespace-pre-wrap text-pretty',
+          'font-mono text-[.94rem] leading-relaxed',
+          streamText.includes('Success') && '',
+          streamText.includes('Info') && '',
+          streamText.includes('Error') && '',
+        )}
       >
         <Markdown
           options={{
@@ -24,6 +29,11 @@ export default function Stream({ streamText, isStream }: PRProps) {
                 <ol className="ml-4 line-clamp-3 list-inside list-disc font-semibold">
                   {children}
                 </ol>
+              ),
+              a: ({ children }) => (
+                <a className="cursor-pointer font-semibold underline">
+                  {children}
+                </a>
               ),
             },
           }}
