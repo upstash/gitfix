@@ -46,46 +46,22 @@ async function* gitfix(
   } else {
     yield `Gitfix discovered ${originalRepo.items.length} files in the repository.\n\n`
   }
-  yield 'Forking the repository. \n\n'
-  let forkedRepo: GithubAPIWrapper
+  let unupdatedItems
   try {
-    forkedRepo = await originalRepo.fork()
-    await sleep(500)
-  } catch (e) {
-    yield 'Error: Forking process failed, aborting!\n\n'
-    console.log(e)
-    return
-  }
-  try {
-    let unupdatedItems = await redis.getDifference(path, originalRepo.items)
+    unupdatedItems = await redis.getDifference(path, originalRepo.items)
     if (unupdatedItems.length < 1) {
       yield 'Gitfix has already corrected all grammar errors in the repository.\n\n'
       return
     }
     console.log(unupdatedItems)
     originalRepo.items = unupdatedItems
-    forkedRepo.items = unupdatedItems
   } catch (e) {
     yield 'Error: Cannot connect to Redis, aborting!\n\n'
     console.log(e)
     return
   }
-  //TODO: smarter file selection
-
-  try {
-    forkedRepo.details['default_branch'] =
-      originalRepo.details['default_branch']
-    await forkedRepo.createARefFromDefaultBranch('gitfix')
-  } catch (e) {
-    console.log(e)
-    yield `Error: Gitfix could not create a new branch for changes.\n
-    This is most likely due to delays in completing the forking process on Github's end.\n
-    Please try again in a minute.\n`
-    return
-  }
-
   let fileIndexes: Set<number> = new Set()
-  if (demo_mode) {
+  {
     let promises: Promise<string | void>[] = []
     let sizes: { [id: number]: number; [size: string]: number }[] = []
     for (let i = 0; i < originalRepo.items.length; i++) {
@@ -98,7 +74,6 @@ async function* gitfix(
     await Promise.all(promises)
     sizes.sort((a, b) => a.size - b.size)
     console.log(sizes)
-    let index = 0
     for (let i = 0; i < sizes.length; i++) {
       console.log(sizes[i])
       if (sizes[i].size > 100 && sizes[i].size < 15000) {
@@ -107,13 +82,6 @@ async function* gitfix(
       if (fileIndexes.size >= config['files-per-run']) {
         break
       }
-    }
-  } else {
-    while (
-      fileIndexes.size <
-      Math.min(config['files-per-run'], originalRepo.items.length)
-    ) {
-      fileIndexes.add(Math.floor(Math.random() * originalRepo.items.length))
     }
   }
   if (fileIndexes.size > 0) {
@@ -127,6 +95,30 @@ async function* gitfix(
   for (let i = 0; i < indexes.length; i++) {
     yield `- ${originalRepo.items[indexes[i]].path}\n\n`
   }
+  yield 'Forking the repository. \n\n'
+  let forkedRepo: GithubAPIWrapper
+  try {
+    forkedRepo = await originalRepo.fork()
+    await sleep(500)
+    forkedRepo.items = unupdatedItems
+  } catch (e) {
+    yield 'Error: Forking process failed, aborting!\n\n'
+    console.log(e)
+    return
+  }
+  
+  try {
+    forkedRepo.details['default_branch'] =
+    originalRepo.details['default_branch']
+    await forkedRepo.createARefFromDefaultBranch('gitfix')
+  } catch (e) {
+    console.log(e)
+    yield `Error: Gitfix could not create a new branch for changes.\n
+    This is most likely due to delays in completing the forking process on Github's end.\n
+    Please try again in a minute.\n`
+    return
+  }
+
   let promises: Promise<void>[] = []
   let yields: string[] = []
   let errored = 0
