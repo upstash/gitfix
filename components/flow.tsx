@@ -30,7 +30,7 @@ export default function Flow() {
   return (
     <>
       <Step className="mt-16 md:mt-20">
-        <Suspense>
+        <Suspense fallback={<span>Loading...</span>}>
           {/* Github profile */}
           <FlowStep1 />
           {/* Select a repository */}

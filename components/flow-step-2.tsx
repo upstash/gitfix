@@ -8,6 +8,7 @@ import { ScrollArea } from './ui/scroll-area'
 import { Table, TableBody, TableCell, TableRow } from './ui/table'
 import store from 'store'
 import Fuse from 'fuse.js'
+import { cn } from '../lib/utils'
 
 export interface FlowStep2Props {}
 
@@ -75,7 +76,10 @@ function DataTable({}: DataTableProps) {
 
       <Content
         asChild
-        className="mt-4 h-[200px] w-full p-0 sm:h-[260px] sm:p-2"
+        className={cn(
+          'mt-4 h-[200px] w-full p-0 sm:h-[260px] sm:p-0',
+          // filterData.length === 1 && 'h-14 sm:h-[68px]',
+        )}
       >
         <ScrollArea>
           <Table className="text-left">

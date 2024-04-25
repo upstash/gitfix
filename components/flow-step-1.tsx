@@ -17,21 +17,20 @@ export default function FlowStep1({}: FlowStep1Props) {
 
   const { setLoadingUser, setUser, setRepos } = store()
 
-  function getCode(): null | string {
-    const code = searchParams.get('code')
-
+  function checkCode() {
+    let code = localStorage.getItem('code')
     if (code) {
-      localStorage.setItem('code', code)
-      return code
+      return init(code)
     }
 
-    return localStorage.getItem('code')
+    code = searchParams.get('code')
+    if (code) {
+      localStorage.setItem('code', code)
+      window.location.href = '/'
+    }
   }
 
-  async function init() {
-    const code = getCode()
-    if (!code) return
-
+  async function init(code: string) {
     try {
       setLoadingUser(true)
 
@@ -39,15 +38,15 @@ export default function FlowStep1({}: FlowStep1Props) {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          code: code.toString(),
+          code,
         },
       })
 
-      const response: { user: Profile; repos: Repository[] } =
+      const response: { user: Profile; repos?: Repository[] } =
         await request.json()
 
       setUser(response.user)
-      setRepos(response.repos)
+      setRepos(response.repos || [])
     } catch (error) {
       console.error(error)
     } finally {
@@ -56,7 +55,7 @@ export default function FlowStep1({}: FlowStep1Props) {
   }
 
   React.useEffect(() => {
-    init()
+    checkCode()
   }, [])
 
   return (
@@ -96,7 +95,7 @@ function Form({}: {}) {
       <div className="flex items-center gap-2 sm:ml-auto">
         <ALink
           className="order-2 sm:-order-10"
-          href="https://github.com/apps/upstash-gitfix/installations/new/"
+          href="https://github.com/apps/gitfix-by-upstash/installations/new/"
         >
           Manage
         </ALink>
@@ -117,7 +116,7 @@ function Form({}: {}) {
     <Content>
       <IconGitHub height={32} className="hidden shrink-0 sm:inline-flex" />
       <Button size="sm" asChild>
-        <a href="https://github.com/apps/upstash-gitfix/installations/new/">
+        <a href="https://github.com/apps/gitfix-by-upstash/installations/new/">
           Login
         </a>
       </Button>
