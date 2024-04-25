@@ -12,7 +12,6 @@ function generate_config_from_environment(): any {
     'upstash-redis-token': process.env.UPSTASH_REDIS_REST_TOKEN,
     'openai-key': process.env.OPENAI_KEY,
     'client-id': process.env.GITHUB_APP_CLIENT_ID,
-    'github-auth': process.env.AUTH_WITH_GITHUB_APP,
     'app-slug': process.env.GITFIX_APP_SLUG,
   }
   console.log(obj)
@@ -89,7 +88,7 @@ async function refreshToken() {
 export default async function getConfig() {
   let gitfixConfig = generate_config_from_environment()
 
-  if (process.env.AUTH_WITH_GITHUB_APP) {
+  if (process.env.GITHUB_APP_CLIENT_ID) {
     if (!(await getSessionId())) {
       throw Error('Broken session, please login again')
     }

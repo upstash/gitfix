@@ -31,7 +31,7 @@ export default async function (config: any) {
       installationId = installation.id
   }
   const repoRequest = await fetch(
-    `https://api.github.com/user/installations/${installationId}/repositories`,
+    `https://api.github.com/user/installations/${installationId}/repositories?per_page=100`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
