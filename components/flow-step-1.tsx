@@ -18,15 +18,18 @@ export default function FlowStep1({}: FlowStep1Props) {
   const { setLoadingUser, setUser, setRepos } = store()
 
   function checkCode() {
-    let code = localStorage.getItem('code')
-    if (code) {
-      return init(code)
-    }
+    let code = searchParams.get('code')
 
-    code = searchParams.get('code')
     if (code) {
       localStorage.setItem('code', code)
       window.location.href = '/'
+      return
+    }
+
+    code = localStorage.getItem('code')
+
+    if (code) {
+      init(code)
     }
   }
 
@@ -41,6 +44,11 @@ export default function FlowStep1({}: FlowStep1Props) {
           code,
         },
       })
+
+      // if (request.status === 401) {
+      //   localStorage.removeItem('code')
+      // }
+      if (!request.ok) throw new Error('Failed to login. Please try again.')
 
       const response: { user: Profile; repos?: Repository[] } =
         await request.json()
