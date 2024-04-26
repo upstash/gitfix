@@ -99,12 +99,37 @@ class GithubAPIWrapper {
   }
 
   async updateFileContent(index: number, content: string): Promise<Response> {
-    const path = this.items[index].path
-    const sha = this.items[index].sha
+    let path = this.items[index].path
+    let sha = this.items[index].sha
+    const url = `https://api.github.com/repos/${this.owner}/${this.repo}/contents/${path}?ref=gitfix`
+
+    const itemResponse = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/vnd.github+json',
+        Authorization: `Bearer ${this.auth}`,
+        'X-GitHub-Api-Version': '2022-11-28',
+      }
+    })
     console.log(`sending update request for ${path}`)
     const contentBytes = new TextEncoder().encode(content)
     const base64String = Buffer.from(contentBytes).toString('base64')
-    const url = `https://api.github.com/repos/${this.owner}/${this.repo}/contents/${path}`
+    let bodyContent
+    if(itemResponse.ok){
+      let itemData = await itemResponse.json()
+      bodyContent = {
+        message: `GitFix: correcting grammar errors on ${path}`,
+        content: base64String,
+        sha: itemData.sha,
+        branch: 'gitfix',
+      }
+    }else{
+      bodyContent = {
+        message: `GitFix: correcting grammar errors on ${path}`,
+        content: base64String,
+        branch: 'gitfix',
+      }
+    } 
     const response = await fetch(url, {
       method: 'PUT',
       headers: {
@@ -112,12 +137,7 @@ class GithubAPIWrapper {
         Authorization: `Bearer ${this.auth}`,
         'X-GitHub-Api-Version': '2022-11-28',
       },
-      body: JSON.stringify({
-        message: `GitFix: correcting grammar errors on ${path}`,
-        content: base64String,
-        sha: sha,
-        branch: 'gitfix',
-      }),
+      body: JSON.stringify(bodyContent),
     })
     if (response.status == 200) {
       this.updatedItems.push(index)
