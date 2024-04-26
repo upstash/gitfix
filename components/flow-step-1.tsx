@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useRef } from 'react'
 import { StepContent, StepItem, StepNumber, StepTitle } from './step-list'
 import Content from './content'
 import { LoaderCircle } from 'lucide-react'
@@ -13,6 +14,7 @@ import ALink from './link'
 export interface FlowStep1Props {}
 
 export default function FlowStep1({}: FlowStep1Props) {
+  const initialized = useRef(false)
   const searchParams = useSearchParams()
 
   const { setLoadingUser, setUser, setRepos } = store()
@@ -44,10 +46,7 @@ export default function FlowStep1({}: FlowStep1Props) {
           code,
         },
       })
-
-      // if (request.status === 401) {
-      //   localStorage.removeItem('code')
-      // }
+      
       if (!request.ok) throw new Error('Failed to login. Please try again.')
 
       const response: { user: Profile; repos?: Repository[] } =
@@ -63,7 +62,10 @@ export default function FlowStep1({}: FlowStep1Props) {
   }
 
   React.useEffect(() => {
-    checkCode()
+    if (!initialized.current) {
+      initialized.current = true
+      checkCode()
+    }
   }, [])
 
   return (
