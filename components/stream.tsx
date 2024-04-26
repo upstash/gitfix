@@ -19,7 +19,7 @@ export default function Stream({ streamText, isStream }: PRProps) {
           'font-mono text-[.94rem] leading-relaxed',
           streamText.includes('Success') && '',
           streamText.includes('Info') && '',
-          streamText.includes('Error') && '',
+          streamText.includes('Error') && 'bg-red-50',
         )}
       >
         <Markdown
