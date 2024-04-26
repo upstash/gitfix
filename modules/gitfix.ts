@@ -43,9 +43,14 @@ async function* gitfix(
     Make sure you inputed your repository name correctly and your repository is indexed in Github search engine.
     If your repository is not indexed, please wait a while until Github indexes your repository.\n\n`
     return
-  } else {
+  } 
+  
+  if(originalRepo.items.length == 1){
+    yield `Gitfix discovered a single file in the repository.\n\n`
+  }else{
     yield `Gitfix discovered ${originalRepo.items.length} files in the repository.\n\n`
   }
+  
   let unupdatedItems
   try {
     unupdatedItems = await redis.getDifference(path, originalRepo.items)
