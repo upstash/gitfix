@@ -137,7 +137,7 @@ async function* gitfix(
             console.log(
               `Updating ${originalRepo.items[index].path} size : ${file_content.length}`,
             )
-            yields.push(`Updating ${originalRepo.items[index].path}\n\n`)
+            yields.push(`Updating ${originalRepo.items[index].path}\n`)
             await forkedRepo.updateFileContent(index, corrected_content)
             await redis.insert(owner, forkedRepo.items[index])
             console.log(
