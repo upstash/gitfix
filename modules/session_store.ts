@@ -35,13 +35,7 @@ export function getSessionIdAndCreateIfMissing() {
 }
 
 export async function createSession(sessionId: SessionId) {
-  let sessionIdValue = getSessionId()
-  if (!sessionIdValue) {
     setSessionId(sessionId)
-
-    return sessionId
-  }
-
   return sessionId
 }
 
