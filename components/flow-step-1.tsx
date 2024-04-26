@@ -46,7 +46,7 @@ export default function FlowStep1({}: FlowStep1Props) {
           code,
         },
       })
-      
+
       if (!request.ok) throw new Error('Failed to login. Please try again.')
 
       const response: { user: Profile; repos?: Repository[] } =

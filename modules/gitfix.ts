@@ -106,10 +106,10 @@ async function* gitfix(
     console.log(e)
     return
   }
-  
+
   try {
     forkedRepo.details['default_branch'] =
-    originalRepo.details['default_branch']
+      originalRepo.details['default_branch']
     await forkedRepo.createARefFromDefaultBranch('gitfix')
   } catch (e) {
     console.log(e)
@@ -196,7 +196,7 @@ async function* gitfix(
     let previousPR = previousPRlist[0]
     console.log(previousPR)
     if (!(await targetRepo.checkIfMerged(previousPR.number))) {
-      yield `Success: Gitfix found a previous PR that includes suggested grammar corrections and appended changes to it. You can see the created request [here](${previousPR.link}).`
+      yield `Success: Gitfix found a previous PR that includes suggested grammar corrections and appended changes to it. You can see the created request \n\n\n > ${previousPR.link}`
       return
     }
   }
@@ -205,7 +205,7 @@ async function* gitfix(
   let content = await response.json()
   console.log(content)
   if (response.ok) {
-    yield `Success: Gitfix created a PR that includes suggested grammar corrections. You can see the created request [here](${content.html_url}).`
+    yield `Success: Gitfix created a PR that includes suggested grammar corrections. You can see the created request \n\n\n > ${content.html_url}`
     redis.insert(prKey, { link: content.html_url, number: content.number })
   } else {
     let response = await forkedRepo.createPR(forkedRepo)

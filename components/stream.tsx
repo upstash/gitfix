@@ -35,6 +35,9 @@ export default function Stream({ streamText, isStream }: PRProps) {
                   {children}
                 </a>
               ),
+              blockquote: ({ children }) => (
+                <div className="bg-red-100">{children}</div>
+              ),
             },
           }}
         >
