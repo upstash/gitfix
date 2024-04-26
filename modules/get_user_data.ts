@@ -22,7 +22,9 @@ export default async function (config: any) {
       },
     },
   )
-
+  if (!installationsRequest.ok) {
+    throw Error('Broken github token')
+  }
   const installationData = await installationsRequest.json()
   let installationId
   for (let i = 0; i < installationData.total_count; i++) {
@@ -41,7 +43,9 @@ export default async function (config: any) {
     },
   )
   const repoData = await repoRequest.json()
-
+  if (!repoRequest.ok) {
+    throw Error('Broken github token')
+  }
   for (let i = 0; i < repoData.length; i++) {
     console.log(repoData[i].repositories.full_name)
   }
