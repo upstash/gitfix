@@ -38,7 +38,7 @@ export default function FlowStep2({}: FlowStep2Props) {
         {hasRepos() ? (
           <>
             If you can&apos;t see your repos,{' '}
-            <ALink href="https://github.com/apps/gitfix-by-upstash/installations/new/">
+            <ALink href="https://github.com/apps/upstash-gitfix/installations/new/">
               check permissions
             </ALink>
           </>

@@ -116,7 +116,7 @@ function Form({}: {}) {
     <Content>
       <IconGitHub height={32} className="hidden shrink-0 sm:inline-flex" />
       <Button size="sm" asChild>
-        <a href="https://github.com/apps/gitfix-by-upstash/installations/new/">
+        <a href="https://github.com/apps/upstash-gitfix/installations/new/">
           Login
         </a>
       </Button>
