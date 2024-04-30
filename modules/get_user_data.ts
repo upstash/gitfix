@@ -25,7 +25,7 @@ export default async function (config: any) {
   if (!installationsRequest.ok) {
     throw Error('Broken github token')
   }
-  if(true){
+  if(process.env.GITFIX_APP_SLUG){
 
     const installationData = await installationsRequest.json()
     let installationId
@@ -49,9 +49,9 @@ export default async function (config: any) {
         if (!repoRequest.ok) {
           throw Error('Broken github token')
         }
-        for (let i = 0; i < repoData.length; i++) {
-          console.log(repoData.repositories[i].full_name)
-          RepoList.push(repoData.repositories[i])
+        for (let k = 0; k < repoData.total_count; k++) {
+          console.log(repoData.repositories[k].full_name)
+          RepoList.push(repoData.repositories[k])
         }
       }
     }
