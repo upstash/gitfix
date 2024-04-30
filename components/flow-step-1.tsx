@@ -9,7 +9,6 @@ import IconGitHub from './icon-github'
 import store from 'store'
 import { useSearchParams } from 'next/navigation'
 import { Profile, Repository } from 'lib/types'
-import ALink from './link'
 
 export interface FlowStep1Props {}
 
@@ -91,7 +90,7 @@ function Form({}: {}) {
     </Content>
   ) : user ? (
     <Content>
-      <div className="flex items-center gap-2">
+      <div className="flex grow items-center gap-2 sm:grow">
         <Image
           src={user.avatar_url}
           alt={user.login}
@@ -102,25 +101,16 @@ function Form({}: {}) {
         <span className="font-medium">{user.login}</span>
       </div>
 
-      <div className="flex items-center gap-2 sm:ml-auto">
-        <ALink
-          className="order-2 sm:-order-10"
-          href="https://github.com/apps/gitfix-by-upstash/installations/new/"
-        >
-          Manage
-        </ALink>
-        <Button
-          size="sm"
-          className="grow"
-          variant="outline"
-          onClick={() => {
-            localStorage.removeItem('code')
-            window.location.href = '/'
-          }}
-        >
-          Logout
-        </Button>
-      </div>
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={() => {
+          localStorage.removeItem('code')
+          window.location.href = '/'
+        }}
+      >
+        Logout
+      </Button>
     </Content>
   ) : (
     <Content>

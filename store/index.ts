@@ -9,6 +9,7 @@ export interface StoreState {
   setUser: (user: Profile | undefined) => void
   repos: Repository[]
   setRepos: (repos: Repository[]) => void
+  hasRepos: () => boolean
   //
   query: string
   setQuery: (query: string) => void
@@ -31,6 +32,7 @@ const store = create<StoreState>((set, get) => ({
   setLoadingUser: (state) => set({ loadingUser: state }),
   repos: [],
   setRepos: (repos) => set({ repos }),
+  hasRepos: () => get().repos.length > 0,
   user: undefined,
   setUser: (user) => set({ user }),
   //
