@@ -131,7 +131,7 @@ function DataTable({}: DataTableProps) {
                       onClick={async () => {
                         if (!user) return
                         setRepo(repo)
-                        await fixRepo(user.login, repo.name)
+                        await fixRepo(repo.owner.login, repo.name)
                       }}
                     >
                       Fix!
