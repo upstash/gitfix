@@ -25,30 +25,54 @@ export default async function (config: any) {
   if (!installationsRequest.ok) {
     throw Error('Broken github token')
   }
-  const installationData = await installationsRequest.json()
-  let installationId
-  for (let i = 0; i < installationData.total_count; i++) {
-    let installation = installationData.installations[i]
-    if (installation.app_slug == config['app-slug'])
-      installationId = installation.id
-  }
-  const repoRequest = await fetch(
-    `https://api.github.com/user/installations/${installationId}/repositories?per_page=100`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'X-GitHub-Api-Version': '2022-11-28',
-        Accept: 'application/vnd.github+json',
-      },
-    },
-  )
-  const repoData = await repoRequest.json()
-  if (!repoRequest.ok) {
-    throw Error('Broken github token')
-  }
-  for (let i = 0; i < repoData.length; i++) {
-    console.log(repoData[i].repositories.full_name)
-  }
+  if(process.env.GITFIX_APP_SLUG){
 
-  return { user: userData, repos: repoData.repositories }
-}
+    const installationData = await installationsRequest.json()
+    let installationId
+    for (let i = 0; i < installationData.total_count; i++) {
+      let installation = installationData.installations[i]
+      if (installation.app_slug == config['app-slug'])
+        installationId = installation.id
+    }
+    const repoRequest = await fetch(
+      `https://api.github.com/user/installations/${installationId}/repositories?per_page=100`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'X-GitHub-Api-Version': '2022-11-28',
+          Accept: 'application/vnd.github+json',
+        },
+      },
+    )
+    const repoData = await repoRequest.json()
+    if (!repoRequest.ok) {
+      throw Error('Broken github token')
+    }
+    for (let i = 0; i < repoData.length; i++) {
+      console.log(repoData[i].repositories.full_name)
+    }
+    
+    return { user: userData, repos: repoData.repositories }
+  }else{
+    const repoRequest = await fetch(
+      `https://api.github.com/user/repos?per_page=100`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'X-GitHub-Api-Version': '2022-11-28',
+          Accept: 'application/vnd.github+json',
+        },
+      },
+    )
+    const repoData = await repoRequest.json()
+    if (!repoRequest.ok) {
+      throw Error('Broken github token')
+    }
+    for (let i = 0; i < repoData.length; i++) {
+      console.log(repoData[i].repositories.full_name)
+    }
+    
+    return { user: userData, repos: repoData.repositories }
+  }
+  }
+  
