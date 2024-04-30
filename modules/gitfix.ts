@@ -100,16 +100,16 @@ async function* gitfix(
   for (let i = 0; i < indexes.length; i++) {
     yield `- ${originalRepo.items[indexes[i]].path}\n\n`
   }
-  yield 'Forking the repository. \n\n'
   let forkedRepo: GithubAPIWrapper
+  yield 'Forking the repository. \n\n'
   try {
     forkedRepo = await originalRepo.fork()
     await sleep(500)
     forkedRepo.items = unupdatedItems
   } catch (e) {
-    yield 'Error: Forking process failed, aborting!\n\n'
+    yield 'Info: Forking process failed, Gitfix will attempt to write changes on the original repository.\n\n'
+    forkedRepo = originalRepo
     console.log(e)
-    return
   }
 
   try {
