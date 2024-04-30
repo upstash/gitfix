@@ -1,5 +1,11 @@
 import * as React from 'react'
-import { StepContent, StepItem, StepNumber, StepTitle } from './step-list'
+import {
+  StepContent,
+  StepDesc,
+  StepItem,
+  StepNumber,
+  StepTitle,
+} from './step-list'
 import Content from './content'
 import IconGitHub from './icon-github'
 import { Button } from './ui/button'
@@ -9,11 +15,12 @@ import { Table, TableBody, TableCell, TableRow } from './ui/table'
 import store from 'store'
 import Fuse from 'fuse.js'
 import { cn } from '../lib/utils'
+import ALink from './link'
 
 export interface FlowStep2Props {}
 
 export default function FlowStep2({}: FlowStep2Props) {
-  const { repos, setRepo, setQuery, repo, query } = store()
+  const { repos, setRepo, hasRepos, setQuery, repo, query } = store()
 
   const onResetRepo = React.useCallback(() => {
     setRepo(undefined)
@@ -24,6 +31,22 @@ export default function FlowStep2({}: FlowStep2Props) {
     <StepItem>
       <StepNumber />
       <StepTitle>Select a repository</StepTitle>
+
+      <StepDesc>
+        {hasRepos() ? (
+          <>
+            If you can't see your repos,{' '}
+            <ALink href="https://github.com/apps/gitfix-by-upstash/installations/new/">
+              check permissions
+            </ALink>
+          </>
+        ) : (
+          <>
+            Select the repo for which you want to make grammatical corrections.
+          </>
+        )}
+      </StepDesc>
+
       {repos.length > 0 && (
         <StepContent>
           {repo ? (
@@ -77,8 +100,8 @@ function DataTable({}: DataTableProps) {
       <Content
         asChild
         className={cn(
-          'mt-4 h-[200px] w-full p-0 sm:h-[260px] sm:p-0',
-          // filterData.length === 1 && 'h-14 sm:h-[68px]',
+          'mt-4 w-full p-0 sm:p-2',
+          filterData.length > 4 && 'h-44 sm:h-52',
         )}
       >
         <ScrollArea>
