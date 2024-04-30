@@ -21,11 +21,12 @@ import { DateTime } from 'luxon'
 export interface FlowStep2Props {}
 
 export default function FlowStep2({}: FlowStep2Props) {
-  const { repos, setRepo, hasRepos, setQuery, repo, query } = store()
+  const { repos, setRepo, hasRepos, setFinish, setQuery, repo, query } = store()
 
   const onResetRepo = React.useCallback(() => {
     setRepo(undefined)
     setQuery('')
+    setFinish(false)
   }, [repo, query])
 
   return (
