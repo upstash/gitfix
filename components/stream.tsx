@@ -13,14 +13,21 @@ export interface PRProps extends ContentProps {
 
 export default function Stream({ streamText, isStream }: PRProps) {
   return (
-    <Content className={cn('px-6')}>
+    <Content
+      className={cn(
+        'px-6',
+        // streamText.includes('Success') &&
+        //   'border-emerald-200 bg-emerald-500/10 text-emerald-600 dark:border-emerald-900 dark:bg-emerald-500/10',
+        // streamText.includes('Info') &&
+        //   'border-blue-200 bg-blue-500/10 text-blue-600 dark:border-blue-900 dark:bg-blue-500/10',
+        streamText.includes('Error') &&
+          'border-red-200 bg-red-500/10 text-red-600 dark:border-red-900 dark:bg-red-500/10',
+      )}
+    >
       <pre
         className={cn(
           'w-full whitespace-pre-wrap text-pretty',
           'font-mono text-[.94rem] leading-relaxed',
-          streamText.includes('Success') && '',
-          streamText.includes('Info') && '',
-          streamText.includes('Error') && 'bg-red-50',
         )}
       >
         <Markdown
