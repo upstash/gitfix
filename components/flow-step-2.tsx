@@ -49,7 +49,7 @@ export default function FlowStep2({}: FlowStep2Props) {
         )}
       </StepDesc>
 
-      {repos.length > 0 && (
+      {hasRepos() && (
         <StepContent>
           {repo ? (
             <Content>
@@ -92,11 +92,15 @@ function DataTable({}: DataTableProps) {
 
   const filterData = query ? fuse.search(query).map((o) => o.item) : repos
 
-  filterData.sort(
-    (a, b) =>
-      DateTime.fromISO(b.updated_at).toMillis() -
-      DateTime.fromISO(a.updated_at).toMillis(),
-  )
+  const sortData = filterData.length
+    ? filterData
+        .filter((o) => !!o)
+        .sort(
+          (a, b) =>
+            DateTime.fromISO(b.updated_at).toMillis() -
+            DateTime.fromISO(a.updated_at).toMillis(),
+        )
+    : []
 
   return (
     <>
@@ -109,13 +113,13 @@ function DataTable({}: DataTableProps) {
         asChild
         className={cn(
           'mt-4 w-full p-0 sm:p-2',
-          filterData.length > 4 && 'h-44 sm:h-52',
+          sortData.length > 4 && 'h-44 sm:h-52',
         )}
       >
         <ScrollArea>
           <Table className="text-left">
             <TableBody>
-              {filterData.map((repo) => (
+              {sortData.map((repo) => (
                 <TableRow key={repo.id}>
                   <TableCell className="py-2 font-medium">
                     {repo.name}
