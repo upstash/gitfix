@@ -16,6 +16,7 @@ import store from 'store'
 import Fuse from 'fuse.js'
 import { cn } from '../lib/utils'
 import ALink from './link'
+import { DateTime } from 'luxon'
 
 export interface FlowStep2Props {}
 
@@ -89,6 +90,12 @@ function DataTable({}: DataTableProps) {
   })
 
   const filterData = query ? fuse.search(query).map((o) => o.item) : repos
+
+  filterData.sort(
+    (a, b) =>
+      DateTime.fromISO(b.updated_at).toMillis() -
+      DateTime.fromISO(a.updated_at).toMillis(),
+  )
 
   return (
     <>

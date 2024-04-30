@@ -4,6 +4,7 @@ import Content, { ContentProps } from './content'
 import { LoaderCircle } from 'lucide-react'
 import Markdown from 'markdown-to-jsx'
 import { StoreState } from '../store'
+import PR from './pr'
 
 export interface PRProps extends ContentProps {
   streamText: StoreState['streamText']
@@ -30,13 +31,8 @@ export default function Stream({ streamText, isStream }: PRProps) {
                   {children}
                 </ol>
               ),
-              a: ({ children }) => (
-                <a className="cursor-pointer font-semibold underline">
-                  {children}
-                </a>
-              ),
               blockquote: ({ children }) => (
-                <div className="bg-red-100">{children}</div>
+                <PR url={children} className="mt-8" />
               ),
             },
           }}

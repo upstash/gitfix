@@ -12,11 +12,17 @@ import Stream from './stream'
 export interface FlowStep3Props {}
 
 export default function FlowStep3({}: FlowStep3Props) {
-  const { repo, isFinish, streamText, isStream } = store()
+  const { repo, setFinish, streamText, isStream } = store()
 
   // Success:
   // Info:
   // Error:
+
+  React.useEffect(() => {
+    if (streamText.includes('Success:')) {
+      setFinish(true)
+    }
+  }, [streamText])
 
   return (
     <StepItem>
