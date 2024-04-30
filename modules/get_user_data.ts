@@ -50,8 +50,10 @@ export default async function (config: any) {
           throw Error('Broken github token')
         }
         for (let k = 0; k < repoData.total_count; k++) {
-          console.log(repoData.repositories[k].full_name)
-          RepoList.push(repoData.repositories[k])
+          if(repoData.repositories[k]){
+            console.log(repoData.repositories[k].full_name)
+            RepoList.push(repoData.repositories[k])
+          }
         }
       }
     }
@@ -72,6 +74,7 @@ export default async function (config: any) {
     if (!repoRequest.ok) {
       throw Error('Broken github token')
     }
+
     for (let i = 0; i < repoData.length; i++) {
       console.log(repoData[i].repositories.full_name)
     }
