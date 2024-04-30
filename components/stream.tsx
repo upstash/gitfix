@@ -39,7 +39,7 @@ export default function Stream({ streamText, isStream }: PRProps) {
                 </ol>
               ),
               blockquote: ({ children }) => (
-                <PR url={children} className="mt-8" />
+                <PR child={children} className="mt-8" />
               ),
             },
           }}

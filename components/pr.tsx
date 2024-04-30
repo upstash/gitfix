@@ -1,13 +1,12 @@
 import * as React from 'react'
 import { cn } from 'lib/utils'
 import Content, { ContentProps } from './content'
-import { Button } from './ui/button'
 
 export interface PRProps extends ContentProps {
-  url: string
+  child: string | React.ReactNode
 }
 
-export default function PR({ url, className }: PRProps) {
+export default function PR({ child, className }: PRProps) {
   return (
     <Content
       className={cn(
@@ -41,11 +40,7 @@ export default function PR({ url, className }: PRProps) {
           <p className="opacity-70 dark:opacity-60">PR opened now by GitFix</p>
         </div>
 
-        <Button asChild className="mt-2">
-          <a href={url} target="_blank">
-            Review
-          </a>
-        </Button>
+        {child}
       </div>
     </Content>
   )
