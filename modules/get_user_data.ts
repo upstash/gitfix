@@ -25,7 +25,7 @@ export default async function (config: any) {
   if (!installationsRequest.ok) {
     throw Error('Broken github token')
   }
-  if(process.env.GITFIX_APP_SLUG){
+  if(true){
 
     const installationData = await installationsRequest.json()
     let installationId
