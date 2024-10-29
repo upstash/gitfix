@@ -1,7 +1,0 @@
-github-repo: "https://github.com/upstash/upstash-web"
-files-per-run: 1
-github-token: "classical github token"
-upstash-redis-url: "https://gitfix-redis-url-upstash.io"
-upstash-redis-token: ""
-redis-password: False #set to true if you are using FLY as a redis provider
-openai-key: ""
