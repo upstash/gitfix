@@ -1,123 +1,120 @@
-# GitFix
+Here's the markdown file with the corrected grammatical errors:
 
-GitFix is a grammar correction application that uses GPT4 to correct grammar errors in md and mdx files in github repositories with a single click.
+```markdown
+# Overview
 
-> [!NOTE]  
-> **This project is a Community Project.**
->
-> The project is maintained and supported by the community. Upstash may contribute but does not officially support or assume responsibility for it.
+GitFix is an AI-powered application that helps developers correct grammatical errors in markdown files within their GitHub repositories. It fetches files from a repository, processes them using AI models to generate corrected content, and then submits a pull request (PR) to the repository owner. It fixes 3 files per run, to avoid API abuse. Previously fixed files are stored at [Upstash Redis](https://upstash.com/pricing/redis), so when a repository is asked again, different 3 files are selected and processed.
 
-### Tech Stack
+## Tech Stack and Tools
 
-- Backend: **Python 3.10** or **NodeJS22**
-- AI Integration: **OpenAI API**
-- Data Storage: **[Upstash Redis](https://upstash.com/docs/redis/overall/getstarted)**
-- Deployment Options: **[Vercel](https://vercel.com)** or **[Fly.io](https://fly.io)**
+- Next.js: Framework for building the frontend and backend.
+- OpenAI: For natural language processing and grammar correction.
+- GitHub API: For interacting with GitHub repositories and creating pull requests.
+- QStash: For handling long-running operations.
+- NextAuth: For authentication with GitHub.
+  
+### Prerequisites
 
-For python implementation, check out gitfix-python folder under this repository.
+- Node.js
+- npm or yarn
+- GitHub account
+- GitHub personal access token
+- GitHub OAuth application
+- NextAuth secret
 
-## How to Use
- To use GitFix, you can simply run `npm i` and create a config.json file in the root folder. 
- Afterwards, you can start your own gitfix server via `npm run dev`.
- Then using `node gitfix_client.js` will fix the grammar errors in the target repository given in the config.json.
+### Installation
 
-### Requirements:
+1- Clone the repository:
 
- - NodeJS 22
- - Having a public repository
- - An Upstash Redis database
- - OpenAI API key
- - Github API token with write permissions
-
-### Contents of the config.json file
-
-- github-repo: Target repository which GitFix will search for grammar errors.
-
-- files-per-run: Number of files Gitfix will change at each run 
-
-- github-token: A classical github token with repo:status, public_repo, and write:packages rights.
-
-- upstash-redis-url: URL to the redis database
-
-- upstash-redis-token: Token or password for the redis database
-
-- redis-password: Set this to true if you are using a password for DB authentication, false otherwise.
-
-- openai-key: OpenAI API key
-
- You can see an example config file in the config.json in this repository.
-
-### Indexing Your Repository
-
-For GitFix to be able to discover your repository, it should be indexed in GitHub Search Engine. 
-
-You can check if it is indexed by performing a search in your github homepage in following format:
-
-```
-repo:[your repo name]  path:*.md
+```bash
+git clone <repository-url>
+cd <repository-directory>
 ```
 
-If search results in your .md files, your repo is ready to go. Otherwise, you should wait until your repo is indexed. This process should take 2-3 minutes
+2- Install dependencies:
 
-### Ready to go
-
- After those steps you can run GitFix.py and gitfix will look for grammar errors and will correct them automatically. 
-
- Afterwards you will receive the corrected content in a PR request to your repository.
-
-### How It Works
-
-<img src="./static/interaction_diagram.png" width="700">
-
-- Gitfix uses Github API to fetch md and mdx files and passes these files to GPT4.
-
-- GPT4 indicates the grammar errors and suggests corrections.
-
-- GitFix forks the repository and pushes the corrections. If the target repository is owned by the github key owner, changes are pushed to a seperate branch.
-
-- Finally, a PR request is sent to the target repository.
-
-### Deploy It Yourself
-
-You can directly create a Vercel Project for free! For more see [deploying github repostiroes with Vercel](https://vercel.com/docs/deployments/git)
-In your repository, you should provide the contents of the config.json file as environment variables.
-Following provides a matching between config.json content and required environment variables.
-
-```
-GITFIX_USE_ENV=true => to instruct gitfix to read environment variables instead of config.json. Existence of config.json file is still required to compile typescript.
-"files-per-run"=> FILES_PER_RUN
-"github-token"=> GITHUB_TOKEN
-"upstash-redis-url"=> process.env.UPSTASH_REDIS_URL
-"upstash-redis-token"=> process.env.UPSTASH_REDIS_TOKEN
-"openai-key": => OPENAI_KEY
+```bash
+npm install
 ```
 
-### Contributing
+3 - Configure environment variables:
 
-GitFix is a work in progress, so we'll add more features and improve the current ones. We've collected a few ideas we believe would make GitFix an even more helpful companion:
+Create a .env file and add the following environment variables:
 
----
+```env
 
-###### Optimize GPT4 Interaction:
+NEXTAUTH_SECRET=
+NEXTAUTH_URL=
 
-Currently, all of the file context is consumed in one message. We would like to have GPT to consume file content in multiple prompts as time complexity of transformers scale with O(n3). 
+GITHUB_TOKEN=
+GITHUB_CLIENT_ID= 
+GITHUB_CLIENT_SECRET=
 
-In the future, we would like to partition the file content to contextually coherent sections and have gpt perform corrections on one section at a time.
+UPSTASH_REDIS_REST_URL=
+UPSTASH_REDIS_REST_TOKEN=
 
----
+QSTASH_URL=
+QSTASH_TOKEN=
 
-###### Enable Unindexed and Private Repositories:
+```
 
-Our current interaction scheme with GitHub API requires the target repo to be a public repository that is indexed in the Github Search Engine. 
+4 - Running the Application:
 
-This may cause problems for small repos as the search engine sometimes fail to index them.
+Start the development server.
 
-If possible, we would like to remove github search api from our pipeline.
+```bash
 
+npm run dev
+```
 
----
+Open your browser and navigate to <http://localhost:5000>.
 
-If one of these ideas sounds like something you'd like to work on, contributions are very welcome! You can contribute by adding new features, fixing bugs, improving the documentation, writing blog posts, or by sharing GitFix on social media.
+**Important note:** In this project, hosting your application on a public server is strongly recommended. QStash requires a publicly accessible server, so using localhost directly won't work. You can use [Vercel Hobby Plan](https://vercel.com/docs/accounts/plans/hobby), it is perfectly fine for our purposes and doesn't require payment or entering billing information. You can modify the project according to your needs, however, we suggest you host them on a website.
 
+## Backend Architecture
 
+### 1- API Endpoints
 
+#### auth
+
+Handles GitHub authentication by using [NextAuth](https://next-auth.js.org/). It manages the login process and redirects the user to the repository searching part.
+
+#### gitfix
+
+Handles the main functionality of fetching files from a repository and processing them. It streams updates to the frontend as the processing progresses.
+
+Key Functions:
+
+- GitHub Authentication: Checks if the user is authenticated, if not, it doesn't allow the user to perform any actions.
+- File Fetching and Processing: Retrieves markdown files from the repository, extracts the text content, and submits files to the AI model by using Upstash QStash.
+- Progress Streaming: Streams progress updates to the frontend.
+  
+#### status
+
+Handles the updating and streaming of the current status of operations. It is responsible for receiving logs from the backend and sending them to the frontend.
+
+### 2- GitHub Integration
+
+The `github-api.ts` file handles the interactions with the GitHub API. Every GitHub operation is implemented in a separate function. Implemented operations are:
+
+- Fetching markdown files
+- Extracting text content
+- Forking repository
+- Committing and uploading an updated file
+- Creating a branch
+- Creating PR
+
+Besides these functions, helper functions are also implemented to improve readability. We won't dive into details, but if you are curious about the implementation of those functions, you can examine the `github-api.ts` file.
+
+### 3- QStash Functionality
+
+QStash is used for handling long-running operations, particularly the AI model processing tasks. This ensures that the operations are handled asynchronously and do not exceed the execution limits of the deployment environment (We used the hobby plan of Vercel, so by using QStash, you don't need to pay for deployment). This part can be explained in 3 main steps:
+
+- Task Submission: When a file is submitted for processing, a task is created and submitted to QStash.
+- Callback Handling: Once the task is completed, QStash triggers a POST request to the callback endpoint in the backend, which was set when you submitted the task in the first step.
+- Result Processing: The callback endpoint processes the results and handles the POST request.
+
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request if you have any improvements or bug fixes.
+```
