@@ -3,11 +3,9 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import PoweredBy from "@/components/ui/powered-by";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, CheckCircle, Loader2 } from "lucide-react";
-import UpstashLogo from "@/components/ui/upstash-logo";
-import PoweredBy from "@/components/ui/powered-by";
 
 interface RepoInfo {
   owner: string;
@@ -19,8 +17,6 @@ interface RepoInfo {
 
 export default function Search() {
   const [url, setUrl] = useState("");
-  const [owner, setOwner] = useState("");
-  const [repo, setRepo] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [logs, setLogs] = useState<string[]>([]);
@@ -90,8 +86,6 @@ export default function Search() {
     const repoInfo = extractRepoInfo(url);
     console.log("repoInfo : ", repoInfo);
     if (repoInfo) {
-      setOwner(repoInfo.owner);
-      setRepo(repoInfo.repo);
       setIsLoading(true);
       setMessage("");
       try {
@@ -160,102 +154,96 @@ export default function Search() {
     }
   };
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <div className="flex items-center justify-center space-x-4">
-            {" "}
-            <UpstashLogo height={40} />
-            <CardTitle className="text-3xl font-bold text-center text-gray-100">
-              GITFIX
-            </CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <Input
-                type="text"
-                placeholder="Enter repository URL or file link"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 focus:z-10 sm:text-sm"
-              />
-            </div>
-            <div>
-              <Button
-                type="submit"
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
-                    Processing
-                  </>
-                ) : (
-                  "Submit"
-                )}
-              </Button>
-            </div>
-          </form>
+    <div className="py-32 px-8 max-w-screen-md mx-auto">
+      <header className="flex items-center gap-1 text-2xl">
+        <img src="/upstash-icon-dark-bg.svg" alt="" className="shrink-0 w-7" />
+        <h2 className="text-3xl">GitFix</h2>
+      </header>
 
-          {message && (
-            <Alert
-              className="mt-4"
-              variant={
-                isLoading
-                  ? "default"
-                  : message.startsWith("ERROR") || message.startsWith("Error")
-                    ? "destructive"
-                    : "default"
-              }
+      <main className="mt-8">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <Input
+              type="text"
+              placeholder="Enter repository URL or file link"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 focus:z-10 sm:text-sm"
+            />
+          </div>
+          <div>
+            <Button
+              type="submit"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
+              disabled={isLoading}
             >
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Status</AlertTitle>
-              <AlertDescription>{message}</AlertDescription>
-            </Alert>
-          )}
-
-          {logs.length > 0 && (
-            <Card className="mt-6 max-h-64 overflow-y-auto">
-              <CardHeader>
-                <CardTitle className="text-lg">Operations</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {logs.map((log, index) => (
-                    <div
-                      key={index}
-                      className={`flex items-center ${
-                        index === 0
-                          ? "bg-emerald-50 text-emerald-700"
-                          : "hover:bg-gray-50"
-                      }`}
-                    >
-                      {log && (
-                        <>
-                          {index === logs.length - 1 &&
-                          polling &&
-                          !log.startsWith("Pull") ? (
-                            <Loader2 className="animate-spin h-4 w-4 mr-2 flex-shrink-0" />
-                          ) : (
-                            <CheckCircle className="h-4 w-4 mr-2 flex-shrink-0 text-emerald-500" />
-                          )}
-                        </>
-                      )}
-                      <span className="text-sm">{log}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-          <div className="flex justify-center mt-8">
-            <PoweredBy />
+              {isLoading ? (
+                <>
+                  <Loader2 className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
+                  Processing
+                </>
+              ) : (
+                "Submit"
+              )}
+            </Button>
           </div>
-        </CardContent>
-      </Card>
+        </form>
+
+        {message && (
+          <Alert
+            className="mt-4"
+            variant={
+              isLoading
+                ? "default"
+                : message.startsWith("ERROR") || message.startsWith("Error")
+                  ? "destructive"
+                  : "default"
+            }
+          >
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Status</AlertTitle>
+            <AlertDescription>{message}</AlertDescription>
+          </Alert>
+        )}
+
+        {logs.length > 0 && (
+          <div className="mt-6 max-h-64 overflow-y-auto">
+            <div>
+              <div className="text-lg">Operations</div>
+            </div>
+            <div>
+              <div className="space-y-2">
+                {logs.map((log, index) => (
+                  <div
+                    key={index}
+                    className={`flex items-center ${
+                      index === 0
+                        ? "bg-emerald-50 text-emerald-700"
+                        : "hover:bg-gray-50"
+                    }`}
+                  >
+                    {log && (
+                      <>
+                        {index === logs.length - 1 &&
+                        polling &&
+                        !log.startsWith("Pull") ? (
+                          <Loader2 className="animate-spin h-4 w-4 mr-2 flex-shrink-0" />
+                        ) : (
+                          <CheckCircle className="h-4 w-4 mr-2 flex-shrink-0 text-emerald-500" />
+                        )}
+                      </>
+                    )}
+                    <span className="text-sm">{log}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+        <div className="flex justify-center mt-8">
+          <PoweredBy />
+        </div>
+      </main>
     </div>
   );
 }

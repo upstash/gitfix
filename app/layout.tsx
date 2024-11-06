@@ -1,8 +1,12 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
 import React from "react";
+import { cn } from "@/lib/utils";
 
-const inter = Inter({ subsets: ["latin"] });
+const fontText = Inter({
+  variable: "--font-sans",
+  subsets: ["latin"],
+});
 
 export const metadata = {
   title: "Gitfix",
@@ -15,8 +19,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html
+      lang="en"
+      className={cn(
+        fontText.variable,
+        "scroll-smooth antialiased bg-zinc-900 text-zinc-50",
+      )}
+    >
+      <body>{children}</body>
     </html>
   );
 }
