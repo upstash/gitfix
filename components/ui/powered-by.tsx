@@ -1,12 +1,12 @@
-import React from 'react'
-import Link from 'next/link'
-import styles from './powered-by.module.css'
+import React from "react";
+import Link from "next/link";
+import styles from "./powered-by.module.css";
 
 const PoweredBy: React.FC = () => {
   return (
     <div className={styles.poweredByContainer}>
       <p className={styles.poweredByText}>
-        Automated grammar correction application 
+        Automated grammar correction application
       </p>
       <div className={styles.poweredByLinks}>
         <Link
@@ -28,7 +28,7 @@ const PoweredBy: React.FC = () => {
         </Link>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default PoweredBy
+export default PoweredBy;

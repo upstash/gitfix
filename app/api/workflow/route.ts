@@ -1,28 +1,28 @@
-import { serve } from '@upstash/qstash/nextjs'
-import { Client } from '@upstash/qstash'
-import OpenAI from 'openai'
-import { Github_API } from '@/lib/github-api'
-import { RedisManager } from '@/lib/redis-utils'
+import { serve } from "@upstash/qstash/nextjs";
+import { Client } from "@upstash/qstash";
+import OpenAI from "openai";
+import { Github_API } from "@/lib/github-api";
+import { RedisManager } from "@/lib/redis-utils";
 
 type OpenAiResponse = {
   choices: {
     message: {
-      role: string
-      content: string | OpenAI.Chat.Completions.ChatCompletion
-    }
-  }[]
-}
+      role: string;
+      content: string | OpenAI.Chat.Completions.ChatCompletion;
+    };
+  }[];
+};
 
 export function GET() {
-  return new Response('Hello from the workflow endpoint!')
+  return new Response("Hello from the workflow endpoint!");
 }
 
 export const POST = serve<{
-  owner: string
-  repo: string
-  type: Number
-  filePath: string | undefined
-  branch: string | undefined
+  owner: string;
+  repo: string;
+  type: Number;
+  filePath: string | undefined;
+  branch: string | undefined;
 }>(
   async (context) => {
     const {
@@ -35,42 +35,42 @@ export const POST = serve<{
       taskID,
       prompt,
       openaiToken,
-    } = await context.run('Worklflow initilization', async () => {
-      return (await initializeWorkflow(context)) as any
-    })
+    } = await context.run("Worklflow initilization", async () => {
+      return (await initializeWorkflow(context)) as any;
+    });
 
     if (!github) {
-      return
+      return;
     }
 
-    let counter = 0
-    let numberOfFiles = Object.keys(github.md_files_content).length
+    let counter = 0;
+    let numberOfFiles = Object.keys(github.md_files_content).length;
 
     for (const filePath of Object.keys(github.md_files_content)) {
-      counter++
-      const originalContent = github.md_files_content[filePath]
-      const isLastFile = counter === numberOfFiles
-      console.log('sending the task to the workflow')
+      counter++;
+      const originalContent = github.md_files_content[filePath];
+      const isLastFile = counter === numberOfFiles;
+      console.log("sending the task to the workflow");
       const response = await context.call<OpenAiResponse>(
-        'markdown grammar correction',
-        'https://api.openai.com/v1/chat/completions',
-        'POST',
+        "markdown grammar correction",
+        "https://api.openai.com/v1/chat/completions",
+        "POST",
         {
-          model: 'gpt-4o',
+          model: "gpt-4o",
           messages: [
             {
-              role: 'system',
-              content: 'You are a grammar correction assistant.',
+              role: "system",
+              content: "You are a grammar correction assistant.",
             },
-            { role: 'user', content: prompt },
-            { role: 'user', content: originalContent },
+            { role: "user", content: prompt },
+            { role: "user", content: originalContent },
           ],
         },
         { authorization: `Bearer ${openaiToken}` },
-      )
+      );
 
-      const corrections = response.choices[0].message.content
-      await context.run('PR creation', async () => {
+      const corrections = response.choices[0].message.content;
+      await context.run("PR creation", async () => {
         await processCorrections(
           owner,
           repo,
@@ -81,57 +81,57 @@ export const POST = serve<{
           forkedRepo,
           taskID,
           isLastFile,
-        )
-      })
+        );
+      });
     }
   },
   {
     retries: 0,
     baseUrl:
-      process.env.NODE_ENV === 'development'
+      process.env.NODE_ENV === "development"
         ? `${process.env.UPSTASH_WORKFLOW_URL}`
         : undefined,
   },
-)
+);
 
 async function initializeWorkflow(context: any) {
-  const client = new Client({ token: process.env.QSTASH_TOKEN as string })
-  const url = process.env.UPSTASH_WORKFLOW_URL + '/api/status'
+  const client = new Client({ token: process.env.QSTASH_TOKEN as string });
+  const url = process.env.UPSTASH_WORKFLOW_URL + "/api/status";
 
-  const redis = new RedisManager()
-  redis.clearDatabase()
-  const request = context.requestPayload
-  const owner = request.owner
-  const repo = request.repo
-  const type = request.type
-  const filePath = request.filePath
-  const branch = request.branch
-  const taskID = request.taskID
-  const inputType = Number(type)
+  const redis = new RedisManager();
+  redis.clearDatabase();
+  const request = context.requestPayload;
+  const owner = request.owner;
+  const repo = request.repo;
+  const type = request.type;
+  const filePath = request.filePath;
+  const branch = request.branch;
+  const taskID = request.taskID;
+  const inputType = Number(type);
 
-  const qstashToken = process.env.QSTASH_TOKEN
-  const openaiToken = process.env.OPENAI_API_KEY
+  const qstashToken = process.env.QSTASH_TOKEN;
+  const openaiToken = process.env.OPENAI_API_KEY;
 
   if (!qstashToken || !openaiToken) {
-    throw new Error('Missing QSTASH_TOKEN or OPENAI_API_KEY')
+    throw new Error("Missing QSTASH_TOKEN or OPENAI_API_KEY");
   }
 
   await client.publish({
     url: url,
     body: JSON.stringify({
-      log: ' Workflow started, repository details are being fetched',
+      log: " Workflow started, repository details are being fetched",
       taskID: taskID,
-      status: 'success',
+      status: "success",
     }),
-  })
+  });
 
-  const github = new Github_API(owner, repo, inputType)
+  const github = new Github_API(owner, repo, inputType);
 
   try {
     if (!inputType) {
-      await github.initializeRepoDetails(filePath, branch)
+      await github.initializeRepoDetails(filePath, branch);
     } else {
-      await github.initializeRepoDetails()
+      await github.initializeRepoDetails();
     }
   } catch (error) {
     await client.publish({
@@ -141,28 +141,28 @@ async function initializeWorkflow(context: any) {
           (error as any).message
         }`,
         taskID: taskID,
-        status: 'error',
+        status: "error",
       }),
-    })
-    return
+    });
+    return;
   }
 
-  const forked_repo_info = await github.forkRepository()
+  const forked_repo_info = await github.forkRepository();
 
   await client.publish({
     url: url,
     body: JSON.stringify({
-      log: 'Repository details are initialized, and the repository is forked',
+      log: "Repository details are initialized, and the repository is forked",
       taskID: taskID,
-      status: 'success',
+      status: "success",
     }),
-  })
+  });
 
-  const forkedOwner = forked_repo_info[0]
-  const forkedRepo = forked_repo_info[1]
+  const forkedOwner = forked_repo_info[0];
+  const forkedRepo = forked_repo_info[1];
 
   try {
-    await github.getFileContent()
+    await github.getFileContent();
   } catch (error) {
     await client.publish({
       url: url,
@@ -171,10 +171,10 @@ async function initializeWorkflow(context: any) {
           (error as any).message
         }`,
         taskID: taskID,
-        status: 'error',
+        status: "error",
       }),
-    })
-    return
+    });
+    return;
   }
 
   const prompt = `
@@ -191,15 +191,15 @@ async function initializeWorkflow(context: any) {
         DO NOT merge lines.
         DO NOT change the words with their synonyms.
         DO NOT erase the front matter section. 
-        `
+        `;
   await client.publish({
     url: url,
     body: JSON.stringify({
       log: `Text content for ${filePath} is sent to the OpenAI API, waiting for the grammatical errors to be fixed`,
       taskID: taskID,
-      status: 'success',
+      status: "success",
     }),
-  })
+  });
 
   return {
     github,
@@ -211,7 +211,7 @@ async function initializeWorkflow(context: any) {
     taskID,
     prompt,
     openaiToken,
-  }
+  };
 }
 
 async function processCorrections(
@@ -225,32 +225,32 @@ async function processCorrections(
   taskID: string,
   isLastFile: boolean,
 ) {
-  const url = process.env.UPSTASH_WORKFLOW_URL + '/api/status'
-  const client = new Client({ token: process.env.QSTASH_TOKEN as string })
+  const url = process.env.UPSTASH_WORKFLOW_URL + "/api/status";
+  const client = new Client({ token: process.env.QSTASH_TOKEN as string });
 
   if (!corrections) {
     await client.publish({
       url: url,
       body: JSON.stringify({
-        log: 'Grammar correction is not returned from the OpenAI API, please check the environment variables',
+        log: "Grammar correction is not returned from the OpenAI API, please check the environment variables",
         taskID: taskID,
-        status: 'error',
+        status: "error",
       }),
-    })
-    return
+    });
+    return;
   }
 
-  const github = new Github_API(owner, repo, 0, filePath)
-  await github.initializeRepoDetails(filePath, branch)
+  const github = new Github_API(owner, repo, 0, filePath);
+  await github.initializeRepoDetails(filePath, branch);
 
   await client.publish({
     url: url,
     body: JSON.stringify({
-      log: 'Grammatical errors are fixed in the markdown file, committing the changes',
+      log: "Grammatical errors are fixed in the markdown file, committing the changes",
       taskID: taskID,
-      status: 'success',
+      status: "success",
     }),
-  })
+  });
 
   try {
     await commitCorrections(
@@ -259,57 +259,55 @@ async function processCorrections(
       corrections,
       forkedOwner,
       forkedRepo,
-    )
+    );
   } catch (error) {
     await client.publish({
       url: url,
       body: JSON.stringify({
         log: `Error committing the changes: ${(error as any).message}`,
         taskID: taskID,
-        status: 'error',
+        status: "error",
       }),
-    })
-    return
+    });
+    return;
   }
 
   await client.publish({
     url: url,
     body: JSON.stringify({
-      log: 'Changes are committed, creating a pull request',
+      log: "Changes are committed, creating a pull request",
       taskID: taskID,
-      status: 'success',
+      status: "success",
     }),
-  })
+  });
 
-  const prTitle = 'Fix grammatical errors in markdown files by Gitfix'
+  const prTitle = "Fix grammatical errors in markdown files by Gitfix";
   const prBody =
-    'This pull request fixes grammatical errors in the markdown files. ' +
-    'Changes are made by Gitfix, which is an AI-powered application, ' +
-    'aims to help developers in their daily tasks.'
-  console.log('Creating a pull request')
+    "This pull request fixes grammatical errors in the markdown files. " +
+    "Changes are made by Gitfix, which is an AI-powered application, " +
+    "aims to help developers in their daily tasks.";
+  console.log("Creating a pull request");
   try {
-    await github.createPullRequest(prTitle, prBody, forkedOwner, forkedRepo)
+    await github.createPullRequest(prTitle, prBody, forkedOwner, forkedRepo);
   } catch (error) {
     await client.publish({
       url: url,
       body: JSON.stringify({
-        log: `Error creating the pull request: ${
-          (error as any).message
-        }`,
+        log: `Error creating the pull request: ${(error as any).message}`,
         taskID: taskID,
-        status: 'error',
+        status: "error",
       }),
-    })
-    return
+    });
+    return;
   }
   await client.publish({
     url: url,
     body: JSON.stringify({
-      log: 'Pull request is created, the task is completed. You can check the pull request on the repository',
+      log: "Pull request is created, the task is completed. You can check the pull request on the repository",
       taskID: taskID,
-      status: 'success',
+      status: "success",
     }),
-  })
+  });
 }
 
 async function commitCorrections(
@@ -326,7 +324,7 @@ async function commitCorrections(
       forkedOwner,
       forkedRepo,
       true,
-    )
+    );
   } catch (error) {
     await github.updateFileContent(
       filePath,
@@ -334,7 +332,7 @@ async function commitCorrections(
       forkedOwner,
       forkedRepo,
       true,
-      'master',
-    )
+      "master",
+    );
   }
 }
