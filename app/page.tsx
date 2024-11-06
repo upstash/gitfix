@@ -26,7 +26,9 @@ export default function Search() {
   const extractRepoInfo = useCallback((url: string): RepoInfo | null => {
     const cleanedUrl = url.endsWith("/") ? url.slice(0, -1) : url;
     const urlParts = cleanedUrl.split("/");
+
     console.log("urlParts:", urlParts);
+
     if (urlParts.length === 5 && urlParts[2] === "github.com") {
       return { owner: urlParts[3], repo: urlParts[4], type: 1 };
     }
@@ -50,6 +52,7 @@ export default function Search() {
 
   useEffect(() => {
     let intervalId: NodeJS.Timeout | null = null;
+
     if (polling) {
       intervalId = setInterval(async () => {
         try {
@@ -83,16 +86,20 @@ export default function Search() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLogs([]);
+
     const repoInfo = extractRepoInfo(url);
     console.log("repoInfo : ", repoInfo);
+
     if (repoInfo) {
       setIsLoading(true);
       setMessage("");
+
       try {
         const endpoint = `/api/workflow`;
         const time = new Date().getTime();
         const taskID = `${repoInfo.owner}@${repoInfo.repo}@${time}`;
         setTaskID(taskID);
+
         const body = JSON.stringify({
           owner: repoInfo.owner,
           repo: repoInfo.repo,
@@ -101,6 +108,7 @@ export default function Search() {
           branch: repoInfo.branch,
           taskID: taskID,
         });
+
         const response = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
